@@ -1,0 +1,128 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.gauge' version '2.1.0'
+}
+
+group = 'com.deryncullen'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '21'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    // Gauge releases repository
+    maven {
+        url "https://repo.maven.apache.org/maven2"
+    }
+    maven {
+        url 'https://repo.jenkins-ci.org/releases/'
+    }
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Database
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.liquibase:liquibase-core'
+
+    // Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // Utilities
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+    // JWT for authentication
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    // OpenAPI / Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // Testing Dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'io.rest-assured:rest-assured'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+    testImplementation 'org.assertj:assertj-core'
+
+    // Gauge for BDD
+    testImplementation 'com.thoughtworks.gauge:gauge-java:0.13.0'
+    testImplementation 'org.assertj:assertj-core:4.0.0-M1'
+
+    // H2 for unit tests
+    testRuntimeOnly 'com.h2database:h2'
+}
+
+gauge {
+    specsDir = 'specs'
+    inParallel = false
+    nodes = 1
+    env = 'default'
+    additionalFlags = '--verbose'
+}
+
+// Task to run unit tests only
+tasks.named('test') {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = false
+    }
+}
+// Separate task for Gauge tests
+tasks.register('gaugeTest', Exec) {
+    dependsOn testClasses
+
+    commandLine 'gauge', 'run', 'specs'
+    workingDir projectDir
+
+    // Set environment variables for Gauge
+    def buildDirPath = layout.buildDirectory.get().asFile
+    environment 'GAUGE_CUSTOM_COMPILE_DIR', "${buildDirPath}/classes/java/main:${buildDirPath}/classes/java/test"
+    environment 'gauge_custom_classpath', sourceSets.test.runtimeClasspath.asPath
+}
+
+// Task to initialize Gauge project
+tasks.register('gaugeInit', Exec) {
+    commandLine 'gauge', 'init', 'java'
+    workingDir projectDir
+}
+
+// Run specific Gauge spec
+tasks.register('gaugeRun', Exec) {
+    dependsOn testClasses
+
+    def specPath = project.hasProperty('spec') ? project.property('spec') : 'specs'
+    commandLine 'gauge', 'run', specPath
+    workingDir projectDir
+
+    // Set environment variables for Gauge
+    def buildDirPath = layout.buildDirectory.get().asFile
+    environment 'GAUGE_CUSTOM_COMPILE_DIR', "${buildDirPath}/classes/java/main:${buildDirPath}/classes/java/test"
+    environment 'gauge_custom_classpath', sourceSets.test.runtimeClasspath.asPath
+}

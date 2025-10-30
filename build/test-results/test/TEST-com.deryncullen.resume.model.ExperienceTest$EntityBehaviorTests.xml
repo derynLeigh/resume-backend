@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Entity Behavior Tests" tests="6" skipped="0" failures="0" errors="0" timestamp="2025-10-30T16:06:19.855Z" hostname="UKL92JV9Y26P" time="0.026">
+  <properties/>
+  <testcase name="Should enforce end date null when position is current" classname="com.deryncullen.resume.model.ExperienceTest$EntityBehaviorTests" time="0.003"/>
+  <testcase name="Should calculate duration for current position" classname="com.deryncullen.resume.model.ExperienceTest$EntityBehaviorTests" time="0.003"/>
+  <testcase name="Should calculate duration for past position" classname="com.deryncullen.resume.model.ExperienceTest$EntityBehaviorTests" time="0.002"/>
+  <testcase name="Should handle technologies list" classname="com.deryncullen.resume.model.ExperienceTest$EntityBehaviorTests" time="0.003"/>
+  <testcase name="Should format date range correctly" classname="com.deryncullen.resume.model.ExperienceTest$EntityBehaviorTests" time="0.008"/>
+  <testcase name="Should handle achievements list" classname="com.deryncullen.resume.model.ExperienceTest$EntityBehaviorTests" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
