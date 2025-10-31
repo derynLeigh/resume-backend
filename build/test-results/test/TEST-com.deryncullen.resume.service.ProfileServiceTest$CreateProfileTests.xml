@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Create Profile Tests" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-10-31T16:49:32.451Z" hostname="UKL92JV9Y26P" time="0.004">
+  <properties/>
+  <testcase name="Should create profile successfully" classname="com.deryncullen.resume.service.ProfileServiceTest$CreateProfileTests" time="0.002"/>
+  <testcase name="Should throw exception when email already exists" classname="com.deryncullen.resume.service.ProfileServiceTest$CreateProfileTests" time="0.002"/>
+  <system-out><![CDATA[2025-10-31 16:49:32 - c.d.resume.service.ProfileService - Creating new profile with email: deryn@example.com
+2025-10-31 16:49:32 - c.d.resume.service.ProfileService - Created new profile with ID: 1
+2025-10-31 16:49:32 - c.d.resume.service.ProfileService - Creating new profile with email: deryn@example.com
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
