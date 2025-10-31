@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Delete Profile Tests" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-10-31T16:49:32.223Z" hostname="UKL92JV9Y26P" time="0.202">
+  <properties/>
+  <testcase name="Should delete profile successfully" classname="com.deryncullen.resume.service.ProfileServiceTest$DeleteProfileTests" time="0.193"/>
+  <testcase name="Should throw exception when deleting non-existent profile" classname="com.deryncullen.resume.service.ProfileServiceTest$DeleteProfileTests" time="0.004"/>
+  <testcase name="Should soft delete profile" classname="com.deryncullen.resume.service.ProfileServiceTest$DeleteProfileTests" time="0.003"/>
+  <system-out><![CDATA[2025-10-31 16:49:32 - c.d.resume.service.ProfileService - Deleting profile with ID: 1
+2025-10-31 16:49:32 - c.d.resume.service.ProfileService - Deleted profile with ID: 1
+2025-10-31 16:49:32 - c.d.resume.service.ProfileService - Deleting profile with ID: 999
+2025-10-31 16:49:32 - c.d.resume.service.ProfileService - Soft deleting profile with ID: 1
+2025-10-31 16:49:32 - c.d.resume.service.ProfileService - Soft deleted profile with ID: 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

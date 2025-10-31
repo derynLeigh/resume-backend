@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-create-profiles-table" author="deryn.cullen">
+        <createTable tableName="profiles">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="phone" type="VARCHAR(20)"/>
+            <column name="location" type="VARCHAR(255)"/>
+            <column name="linkedin_url" type="VARCHAR(255)"/>
+            <column name="github_url" type="VARCHAR(255)"/>
+            <column name="website_url" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="summary" type="TEXT"/>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"/>
+        </createTable>
+        
+        <createIndex tableName="profiles" indexName="idx_profile_email">
+            <column name="email"/>
+        </createIndex>
+        
+        <createIndex tableName="profiles" indexName="idx_profile_active">
+            <column name="active"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="002-create-experiences-table" author="deryn.cullen">
+        <createTable tableName="experiences">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="profile_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_experience_profile" 
+                           references="profiles(id)" deleteCascade="true"/>
+            </column>
+            <column name="company_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location" type="VARCHAR(255)"/>
+            <column name="start_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="DATE"/>
+            <column name="is_current" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="display_order" type="INTEGER"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"/>
+        </createTable>
+        
+        <createIndex tableName="experiences" indexName="idx_experience_profile">
+            <column name="profile_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="003-create-experience-achievements-table" author="deryn.cullen">
+        <createTable tableName="experience_achievements">
+            <column name="experience_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_achievement_experience" 
+                           references="experiences(id)" deleteCascade="true"/>
+            </column>
+            <column name="achievement" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_order" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addPrimaryKey tableName="experience_achievements" 
+                      columnNames="experience_id,display_order"/>
+    </changeSet>
+
+    <changeSet id="004-create-experience-technologies-table" author="deryn.cullen">
+        <createTable tableName="experience_technologies">
+            <column name="experience_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_technology_experience" 
+                           references="experiences(id)" deleteCascade="true"/>
+            </column>
+            <column name="technology" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addPrimaryKey tableName="experience_technologies" 
+                      columnNames="experience_id,technology"/>
+    </changeSet>
+
+    <changeSet id="005-create-educations-table" author="deryn.cullen">
+        <createTable tableName="educations">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="profile_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_education_profile" 
+                           references="profiles(id)" deleteCascade="true"/>
+            </column>
+            <column name="institution_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="degree" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="field_of_study" type="VARCHAR(255)"/>
+            <column name="start_date" type="DATE"/>
+            <column name="graduation_date" type="DATE"/>
+            <column name="grade" type="VARCHAR(10)"/>
+            <column name="description" type="TEXT"/>
+            <column name="display_order" type="INTEGER"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"/>
+        </createTable>
+        
+        <createIndex tableName="educations" indexName="idx_education_profile">
+            <column name="profile_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="006-create-skills-table" author="deryn.cullen">
+        <createTable tableName="skills">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="profile_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_skill_profile" 
+                           references="profiles(id)" deleteCascade="true"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="proficiency_level" type="VARCHAR(50)"/>
+            <column name="years_of_experience" type="INTEGER"/>
+            <column name="display_order" type="INTEGER"/>
+            <column name="is_primary" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"/>
+        </createTable>
+        
+        <createIndex tableName="skills" indexName="idx_skill_profile">
+            <column name="profile_id"/>
+        </createIndex>
+        
+        <createIndex tableName="skills" indexName="idx_skill_category">
+            <column name="category"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="007-create-certifications-table" author="deryn.cullen">
+        <createTable tableName="certifications">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="profile_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_certification_profile" 
+                           references="profiles(id)" deleteCascade="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="issuing_organization" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="credential_id" type="VARCHAR(100)"/>
+            <column name="credential_url" type="VARCHAR(500)"/>
+            <column name="date_obtained" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiration_date" type="DATE"/>
+            <column name="does_not_expire" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="display_order" type="INTEGER"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"/>
+        </createTable>
+        
+        <createIndex tableName="certifications" indexName="idx_certification_profile">
+            <column name="profile_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

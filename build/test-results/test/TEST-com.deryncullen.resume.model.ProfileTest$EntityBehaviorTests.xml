@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Entity Behavior Tests" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-10-31T16:49:29.560Z" hostname="UKL92JV9Y26P" time="0.023">
+  <properties/>
+  <testcase name="Should set creation timestamp on new profile" classname="com.deryncullen.resume.model.ProfileTest$EntityBehaviorTests" time="0.003"/>
+  <testcase name="Should correctly build full name" classname="com.deryncullen.resume.model.ProfileTest$EntityBehaviorTests" time="0.002"/>
+  <testcase name="Should update timestamp on profile update" classname="com.deryncullen.resume.model.ProfileTest$EntityBehaviorTests" time="0.015"/>
+  <testcase name="Should mark profile as active by default" classname="com.deryncullen.resume.model.ProfileTest$EntityBehaviorTests" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

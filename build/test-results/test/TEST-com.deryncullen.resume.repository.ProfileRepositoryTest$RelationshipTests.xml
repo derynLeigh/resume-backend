@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Relationship Tests" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-10-31T16:49:31.663Z" hostname="UKL92JV9Y26P" time="0.483">
+  <properties/>
+  <testcase name="Should save profile with experiences" classname="com.deryncullen.resume.repository.ProfileRepositoryTest$RelationshipTests" time="0.452"/>
+  <testcase name="Should cascade delete relationships" classname="com.deryncullen.resume.repository.ProfileRepositoryTest$RelationshipTests" time="0.017"/>
+  <testcase name="Should save profile with skills" classname="com.deryncullen.resume.repository.ProfileRepositoryTest$RelationshipTests" time="0.012"/>
+  <system-out><![CDATA[16:49:29.765 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.deryncullen.resume.repository.ProfileRepositoryTest$RelationshipTests]: RelationshipTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+16:49:29.773 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.deryncullen.resume.ResumeBackendApplication for test class com.deryncullen.resume.repository.ProfileRepositoryTest$RelationshipTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.0)
+
+2025-10-31 16:49:29 - o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/Users/dcl64/.gradle/caches/modules-2/files-2.1/org.json/json/20250517/d67181bbd819ccceb929b580a4e2fcb0c8b17cd8/json-20250517.jar!/org/json/JSONObject.class
+	jar:file:/Users/dcl64/.gradle/caches/modules-2/files-2.1/com.vaadin.external.google/android-json/0.0.20131108.vaadin1/fa26d351fe62a6a17f5cda1287c1c6110dec413f/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2025-10-31 16:49:29 - c.d.r.r.ProfileRepositoryTest - Starting ProfileRepositoryTest using Java 21 with PID 42062 (started by dcl64 in /Users/dcl64/Documents/IntelliJ/resume-backend)
+2025-10-31 16:49:29 - c.d.r.r.ProfileRepositoryTest - Running with Spring Boot v3.2.0, Spring v6.1.1
+2025-10-31 16:49:29 - c.d.r.r.ProfileRepositoryTest - The following 1 profile is active: "test"
+2025-10-31 16:49:30 - o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-31 16:49:30 - o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 35 ms. Found 1 JPA repository interface.
+2025-10-31 16:49:30 - o.s.b.t.a.j.TestDatabaseAutoConfiguration$EmbeddedDataSourceBeanFactoryPostProcessor - Replacing 'dataSource' DataSource bean with embedded version
+2025-10-31 16:49:30 - o.s.j.d.e.EmbeddedDatabaseFactory - Starting embedded database: url='jdbc:h2:mem:8f75a9f2-b5ba-4c79-ae46-b67eb42263a3;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+2025-10-31 16:49:30 - o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-31 16:49:30 - org.hibernate.Version - HHH000412: Hibernate ORM core version 6.3.1.Final
+2025-10-31 16:49:30 - o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-10-31 16:49:30 - o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-31 16:49:30 - org.hibernate.dialect.Dialect - HHH000511: The 2.2.0 version for [org.hibernate.dialect.PostgreSQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 11.0.0. Check the community dialects project for available legacy versions.
+2025-10-31 16:49:30 - org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-31 16:49:31 - o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists certifications 
+       drop constraint if exists FK1lekxgkqq06m3do2nt33lnogq
+Hibernate: 
+    alter table if exists certifications 
+       drop constraint if exists FK1lekxgkqq06m3do2nt33lnogq
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists educations 
+       drop constraint if exists FKbufn19514tqheek69srnucok2
+Hibernate: 
+    alter table if exists educations 
+       drop constraint if exists FKbufn19514tqheek69srnucok2
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists experience_achievements 
+       drop constraint if exists FK7ch0njurd5ix8uyu36h23yixo
+Hibernate: 
+    alter table if exists experience_achievements 
+       drop constraint if exists FK7ch0njurd5ix8uyu36h23yixo
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists experience_technologies 
+       drop constraint if exists FKf8eyd40oy053stj3tfse0yboh
+Hibernate: 
+    alter table if exists experience_technologies 
+       drop constraint if exists FKf8eyd40oy053stj3tfse0yboh
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists experiences 
+       drop constraint if exists FKm5uwrkg7h159o8kbot8f2i1op
+Hibernate: 
+    alter table if exists experiences 
+       drop constraint if exists FKm5uwrkg7h159o8kbot8f2i1op
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists skills 
+       drop constraint if exists FK60dgf0shifcegmvwh3a5qkm8x
+Hibernate: 
+    alter table if exists skills 
+       drop constraint if exists FK60dgf0shifcegmvwh3a5qkm8x
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    drop table if exists certifications cascade
+Hibernate: 
+    drop table if exists certifications cascade
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    drop table if exists educations cascade
+Hibernate: 
+    drop table if exists educations cascade
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    drop table if exists experience_achievements cascade
+Hibernate: 
+    drop table if exists experience_achievements cascade
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    drop table if exists experience_technologies cascade
+Hibernate: 
+    drop table if exists experience_technologies cascade
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    drop table if exists experiences cascade
+Hibernate: 
+    drop table if exists experiences cascade
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    drop table if exists profiles cascade
+Hibernate: 
+    drop table if exists profiles cascade
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    drop table if exists skills cascade
+Hibernate: 
+    drop table if exists skills cascade
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    create table certifications (
+        date_obtained date not null,
+        display_order integer,
+        does_not_expire boolean,
+        expiration_date date,
+        created_at timestamp(6) not null,
+        id bigserial not null,
+        profile_id bigint not null,
+        updated_at timestamp(6) not null,
+        version bigint,
+        credential_id varchar(255),
+        credential_url varchar(255),
+        issuing_organization varchar(255) not null,
+        name varchar(255) not null,
+        description TEXT,
+        primary key (id)
+    )
+Hibernate: 
+    create table certifications (
+        date_obtained date not null,
+        display_order integer,
+        does_not_expire boolean,
+        expiration_date date,
+        created_at timestamp(6) not null,
+        id bigserial not null,
+        profile_id bigint not null,
+        updated_at timestamp(6) not null,
+        version bigint,
+        credential_id varchar(255),
+        credential_url varchar(255),
+        issuing_organization varchar(255) not null,
+        name varchar(255) not null,
+        description TEXT,
+        primary key (id)
+    )
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    create table educations (
+        display_order integer,
+        graduation_date date,
+        start_date date,
+        created_at timestamp(6) not null,
+        id bigserial not null,
+        profile_id bigint not null,
+        updated_at timestamp(6) not null,
+        version bigint,
+        degree varchar(255) not null,
+        field_of_study varchar(255),
+        grade varchar(255),
+        institution_name varchar(255) not null,
+        description TEXT,
+        primary key (id)
+    )
+Hibernate: 
+    create table educations (
+        display_order integer,
+        graduation_date date,
+        start_date date,
+        created_at timestamp(6) not null,
+        id bigserial not null,
+        profile_id bigint not null,
+        updated_at timestamp(6) not null,
+        version bigint,
+        degree varchar(255) not null,
+        field_of_study varchar(255),
+        grade varchar(255),
+        institution_name varchar(255) not null,
+        description TEXT,
+        primary key (id)
+    )
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    create table experience_achievements (
+        display_order integer not null,
+        experience_id bigint not null,
+        achievement TEXT,
+        primary key (display_order, experience_id)
+    )
+Hibernate: 
+    create table experience_achievements (
+        display_order integer not null,
+        experience_id bigint not null,
+        achievement TEXT,
+        primary key (display_order, experience_id)
+    )
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    create table experience_technologies (
+        experience_id bigint not null,
+        technology varchar(255)
+    )
+Hibernate: 
+    create table experience_technologies (
+        experience_id bigint not null,
+        technology varchar(255)
+    )
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    create table experiences (
+        display_order integer,
+        end_date date,
+        is_current boolean not null,
+        start_date date not null,
+        created_at timestamp(6) not null,
+        id bigserial not null,
+        profile_id bigint not null,
+        updated_at timestamp(6) not null,
+        version bigint,
+        company_name varchar(255) not null,
+        job_title varchar(255) not null,
+        location varchar(255),
+        description TEXT,
+        primary key (id)
+    )
+Hibernate: 
+    create table experiences (
+        display_order integer,
+        end_date date,
+        is_current boolean not null,
+        start_date date not null,
+        created_at timestamp(6) not null,
+        id bigserial not null,
+        profile_id bigint not null,
+        updated_at timestamp(6) not null,
+        version bigint,
+        company_name varchar(255) not null,
+        job_title varchar(255) not null,
+        location varchar(255),
+        description TEXT,
+        primary key (id)
+    )
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    create table profiles (
+        active boolean not null,
+        created_at timestamp(6) not null,
+        id bigserial not null,
+        updated_at timestamp(6) not null,
+        version bigint,
+        email varchar(255) not null unique,
+        first_name varchar(255) not null,
+        github_url varchar(255),
+        last_name varchar(255) not null,
+        linkedin_url varchar(255),
+        location varchar(255),
+        phone varchar(255),
+        title varchar(255) not null,
+        website_url varchar(255),
+        summary TEXT,
+        primary key (id)
+    )
+Hibernate: 
+    create table profiles (
+        active boolean not null,
+        created_at timestamp(6) not null,
+        id bigserial not null,
+        updated_at timestamp(6) not null,
+        version bigint,
+        email varchar(255) not null unique,
+        first_name varchar(255) not null,
+        github_url varchar(255),
+        last_name varchar(255) not null,
+        linkedin_url varchar(255),
+        location varchar(255),
+        phone varchar(255),
+        title varchar(255) not null,
+        website_url varchar(255),
+        summary TEXT,
+        primary key (id)
+    )
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    create table skills (
+        display_order integer,
+        is_primary boolean,
+        years_of_experience integer,
+        created_at timestamp(6) not null,
+        id bigserial not null,
+        profile_id bigint not null,
+        updated_at timestamp(6) not null,
+        version bigint,
+        category varchar(255) not null check (category in ('PROGRAMMING_LANGUAGE','FRAMEWORK','DATABASE','TOOL','METHODOLOGY','SOFT_SKILL','OTHER')),
+        name varchar(255) not null,
+        proficiency_level varchar(255) check (proficiency_level in ('BEGINNER','INTERMEDIATE','ADVANCED','EXPERT')),
+        primary key (id)
+    )
+Hibernate: 
+    create table skills (
+        display_order integer,
+        is_primary boolean,
+        years_of_experience integer,
+        created_at timestamp(6) not null,
+        id bigserial not null,
+        profile_id bigint not null,
+        updated_at timestamp(6) not null,
+        version bigint,
+        category varchar(255) not null check (category in ('PROGRAMMING_LANGUAGE','FRAMEWORK','DATABASE','TOOL','METHODOLOGY','SOFT_SKILL','OTHER')),
+        name varchar(255) not null,
+        proficiency_level varchar(255) check (proficiency_level in ('BEGINNER','INTERMEDIATE','ADVANCED','EXPERT')),
+        primary key (id)
+    )
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists certifications 
+       add constraint FK1lekxgkqq06m3do2nt33lnogq 
+       foreign key (profile_id) 
+       references profiles
+Hibernate: 
+    alter table if exists certifications 
+       add constraint FK1lekxgkqq06m3do2nt33lnogq 
+       foreign key (profile_id) 
+       references profiles
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists educations 
+       add constraint FKbufn19514tqheek69srnucok2 
+       foreign key (profile_id) 
+       references profiles
+Hibernate: 
+    alter table if exists educations 
+       add constraint FKbufn19514tqheek69srnucok2 
+       foreign key (profile_id) 
+       references profiles
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists experience_achievements 
+       add constraint FK7ch0njurd5ix8uyu36h23yixo 
+       foreign key (experience_id) 
+       references experiences
+Hibernate: 
+    alter table if exists experience_achievements 
+       add constraint FK7ch0njurd5ix8uyu36h23yixo 
+       foreign key (experience_id) 
+       references experiences
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists experience_technologies 
+       add constraint FKf8eyd40oy053stj3tfse0yboh 
+       foreign key (experience_id) 
+       references experiences
+Hibernate: 
+    alter table if exists experience_technologies 
+       add constraint FKf8eyd40oy053stj3tfse0yboh 
+       foreign key (experience_id) 
+       references experiences
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists experiences 
+       add constraint FKm5uwrkg7h159o8kbot8f2i1op 
+       foreign key (profile_id) 
+       references profiles
+Hibernate: 
+    alter table if exists experiences 
+       add constraint FKm5uwrkg7h159o8kbot8f2i1op 
+       foreign key (profile_id) 
+       references profiles
+2025-10-31 16:49:31 - org.hibernate.SQL - 
+    alter table if exists skills 
+       add constraint FK60dgf0shifcegmvwh3a5qkm8x 
+       foreign key (profile_id) 
+       references profiles
+Hibernate: 
+    alter table if exists skills 
+       add constraint FK60dgf0shifcegmvwh3a5qkm8x 
+       foreign key (profile_id) 
+       references profiles
+2025-10-31 16:49:31 - o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-31 16:49:31 - o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-31 16:49:31 - c.d.r.r.ProfileRepositoryTest - Started ProfileRepositoryTest in 1.861 seconds (process running for 2.817)
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* insert for
+        com.deryncullen.resume.model.Profile */insert 
+    into
+        profiles (active, created_at, email, first_name, github_url, last_name, linkedin_url, location, phone, summary, title, updated_at, version, website_url) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    /* insert for
+        com.deryncullen.resume.model.Profile */insert 
+    into
+        profiles (active, created_at, email, first_name, github_url, last_name, linkedin_url, location, phone, summary, title, updated_at, version, website_url) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* insert for
+        com.deryncullen.resume.model.Experience */insert 
+    into
+        experiences (company_name, created_at, is_current, description, display_order, end_date, job_title, location, profile_id, start_date, updated_at, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    /* insert for
+        com.deryncullen.resume.model.Experience */insert 
+    into
+        experiences (company_name, created_at, is_current, description, display_order, end_date, job_title, location, profile_id, start_date, updated_at, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* insert for
+        com.deryncullen.resume.model.Experience */insert 
+    into
+        experiences (company_name, created_at, is_current, description, display_order, end_date, job_title, location, profile_id, start_date, updated_at, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    /* insert for
+        com.deryncullen.resume.model.Experience */insert 
+    into
+        experiences (company_name, created_at, is_current, description, display_order, end_date, job_title, location, profile_id, start_date, updated_at, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* SELECT
+        p 
+    FROM
+        Profile p 
+    LEFT JOIN
+        
+    FETCH
+        p.experiences 
+    WHERE
+        p.id = :id */ select
+            p1_0.id,
+            p1_0.active,
+            p1_0.created_at,
+            p1_0.email,
+            e1_0.profile_id,
+            e1_0.id,
+            e1_0.company_name,
+            e1_0.created_at,
+            e1_0.is_current,
+            e1_0.description,
+            e1_0.display_order,
+            e1_0.end_date,
+            e1_0.job_title,
+            e1_0.location,
+            e1_0.start_date,
+            e1_0.updated_at,
+            e1_0.version,
+            p1_0.first_name,
+            p1_0.github_url,
+            p1_0.last_name,
+            p1_0.linkedin_url,
+            p1_0.location,
+            p1_0.phone,
+            p1_0.summary,
+            p1_0.title,
+            p1_0.updated_at,
+            p1_0.version,
+            p1_0.website_url 
+        from
+            profiles p1_0 
+        left join
+            experiences e1_0 
+                on p1_0.id=e1_0.profile_id 
+        where
+            p1_0.id=? 
+        order by
+            e1_0.start_date desc
+Hibernate: 
+    /* SELECT
+        p 
+    FROM
+        Profile p 
+    LEFT JOIN
+        
+    FETCH
+        p.experiences 
+    WHERE
+        p.id = :id */ select
+            p1_0.id,
+            p1_0.active,
+            p1_0.created_at,
+            p1_0.email,
+            e1_0.profile_id,
+            e1_0.id,
+            e1_0.company_name,
+            e1_0.created_at,
+            e1_0.is_current,
+            e1_0.description,
+            e1_0.display_order,
+            e1_0.end_date,
+            e1_0.job_title,
+            e1_0.location,
+            e1_0.start_date,
+            e1_0.updated_at,
+            e1_0.version,
+            p1_0.first_name,
+            p1_0.github_url,
+            p1_0.last_name,
+            p1_0.linkedin_url,
+            p1_0.location,
+            p1_0.phone,
+            p1_0.summary,
+            p1_0.title,
+            p1_0.updated_at,
+            p1_0.version,
+            p1_0.website_url 
+        from
+            profiles p1_0 
+        left join
+            experiences e1_0 
+                on p1_0.id=e1_0.profile_id 
+        where
+            p1_0.id=? 
+        order by
+            e1_0.start_date desc
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* insert for
+        com.deryncullen.resume.model.Profile */insert 
+    into
+        profiles (active, created_at, email, first_name, github_url, last_name, linkedin_url, location, phone, summary, title, updated_at, version, website_url) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    /* insert for
+        com.deryncullen.resume.model.Profile */insert 
+    into
+        profiles (active, created_at, email, first_name, github_url, last_name, linkedin_url, location, phone, summary, title, updated_at, version, website_url) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* insert for
+        com.deryncullen.resume.model.Experience */insert 
+    into
+        experiences (company_name, created_at, is_current, description, display_order, end_date, job_title, location, profile_id, start_date, updated_at, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    /* insert for
+        com.deryncullen.resume.model.Experience */insert 
+    into
+        experiences (company_name, created_at, is_current, description, display_order, end_date, job_title, location, profile_id, start_date, updated_at, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* delete for com.deryncullen.resume.model.Experience */delete 
+    from
+        experiences 
+    where
+        id=? 
+        and version=?
+Hibernate: 
+    /* delete for com.deryncullen.resume.model.Experience */delete 
+    from
+        experiences 
+    where
+        id=? 
+        and version=?
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* delete for com.deryncullen.resume.model.Profile */delete 
+    from
+        profiles 
+    where
+        id=? 
+        and version=?
+Hibernate: 
+    /* delete for com.deryncullen.resume.model.Profile */delete 
+    from
+        profiles 
+    where
+        id=? 
+        and version=?
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    select
+        p1_0.id,
+        p1_0.active,
+        p1_0.created_at,
+        p1_0.email,
+        p1_0.first_name,
+        p1_0.github_url,
+        p1_0.last_name,
+        p1_0.linkedin_url,
+        p1_0.location,
+        p1_0.phone,
+        p1_0.summary,
+        p1_0.title,
+        p1_0.updated_at,
+        p1_0.version,
+        p1_0.website_url 
+    from
+        profiles p1_0 
+    where
+        p1_0.id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.active,
+        p1_0.created_at,
+        p1_0.email,
+        p1_0.first_name,
+        p1_0.github_url,
+        p1_0.last_name,
+        p1_0.linkedin_url,
+        p1_0.location,
+        p1_0.phone,
+        p1_0.summary,
+        p1_0.title,
+        p1_0.updated_at,
+        p1_0.version,
+        p1_0.website_url 
+    from
+        profiles p1_0 
+    where
+        p1_0.id=?
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* insert for
+        com.deryncullen.resume.model.Profile */insert 
+    into
+        profiles (active, created_at, email, first_name, github_url, last_name, linkedin_url, location, phone, summary, title, updated_at, version, website_url) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    /* insert for
+        com.deryncullen.resume.model.Profile */insert 
+    into
+        profiles (active, created_at, email, first_name, github_url, last_name, linkedin_url, location, phone, summary, title, updated_at, version, website_url) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* insert for
+        com.deryncullen.resume.model.Skill */insert 
+    into
+        skills (category, created_at, display_order, name, is_primary, proficiency_level, profile_id, updated_at, version, years_of_experience) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    /* insert for
+        com.deryncullen.resume.model.Skill */insert 
+    into
+        skills (category, created_at, display_order, name, is_primary, proficiency_level, profile_id, updated_at, version, years_of_experience) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* insert for
+        com.deryncullen.resume.model.Skill */insert 
+    into
+        skills (category, created_at, display_order, name, is_primary, proficiency_level, profile_id, updated_at, version, years_of_experience) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    /* insert for
+        com.deryncullen.resume.model.Skill */insert 
+    into
+        skills (category, created_at, display_order, name, is_primary, proficiency_level, profile_id, updated_at, version, years_of_experience) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-10-31 16:49:32 - org.hibernate.SQL - 
+    /* SELECT
+        p 
+    FROM
+        Profile p 
+    LEFT JOIN
+        
+    FETCH
+        p.skills 
+    WHERE
+        p.id = :id */ select
+            p1_0.id,
+            p1_0.active,
+            p1_0.created_at,
+            p1_0.email,
+            p1_0.first_name,
+            p1_0.github_url,
+            p1_0.last_name,
+            p1_0.linkedin_url,
+            p1_0.location,
+            p1_0.phone,
+            s1_0.profile_id,
+            s1_0.id,
+            s1_0.category,
+            s1_0.created_at,
+            s1_0.display_order,
+            s1_0.name,
+            s1_0.is_primary,
+            s1_0.proficiency_level,
+            s1_0.updated_at,
+            s1_0.version,
+            s1_0.years_of_experience,
+            p1_0.summary,
+            p1_0.title,
+            p1_0.updated_at,
+            p1_0.version,
+            p1_0.website_url 
+        from
+            profiles p1_0 
+        left join
+            skills s1_0 
+                on p1_0.id=s1_0.profile_id 
+        where
+            p1_0.id=? 
+        order by
+            s1_0.display_order
+Hibernate: 
+    /* SELECT
+        p 
+    FROM
+        Profile p 
+    LEFT JOIN
+        
+    FETCH
+        p.skills 
+    WHERE
+        p.id = :id */ select
+            p1_0.id,
+            p1_0.active,
+            p1_0.created_at,
+            p1_0.email,
+            p1_0.first_name,
+            p1_0.github_url,
+            p1_0.last_name,
+            p1_0.linkedin_url,
+            p1_0.location,
+            p1_0.phone,
+            s1_0.profile_id,
+            s1_0.id,
+            s1_0.category,
+            s1_0.created_at,
+            s1_0.display_order,
+            s1_0.name,
+            s1_0.is_primary,
+            s1_0.proficiency_level,
+            s1_0.updated_at,
+            s1_0.version,
+            s1_0.years_of_experience,
+            p1_0.summary,
+            p1_0.title,
+            p1_0.updated_at,
+            p1_0.version,
+            p1_0.website_url 
+        from
+            profiles p1_0 
+        left join
+            skills s1_0 
+                on p1_0.id=s1_0.profile_id 
+        where
+            p1_0.id=? 
+        order by
+            s1_0.display_order
+]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/Users/dcl64/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.10/90ed94ac044ea8953b224304c762316e91fd6b31/byte-buddy-agent-1.14.10.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

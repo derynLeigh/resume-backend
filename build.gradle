@@ -76,6 +76,17 @@ dependencies {
     testRuntimeOnly 'com.h2database:h2'
 }
 
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// Task to run unit tests only
+tasks.register('unitTest', Test) {
+    useJUnitPlatform {
+        excludeTags 'integration'
+    }
+}
+
 gauge {
     specsDir = 'specs'
     inParallel = false
@@ -84,45 +95,23 @@ gauge {
     additionalFlags = '--verbose'
 }
 
-// Task to run unit tests only
-tasks.named('test') {
-    useJUnitPlatform()
-
-    testLogging {
-        events "passed", "skipped", "failed"
-        exceptionFormat "full"
-        showStandardStreams = false
-    }
-}
-// Separate task for Gauge tests
-tasks.register('gaugeTest', Exec) {
-    dependsOn testClasses
-
-    commandLine 'gauge', 'run', 'specs'
-    workingDir projectDir
-
-    // Set environment variables for Gauge
-    def buildDirPath = layout.buildDirectory.get().asFile
-    environment 'GAUGE_CUSTOM_COMPILE_DIR', "${buildDirPath}/classes/java/main:${buildDirPath}/classes/java/test"
-    environment 'gauge_custom_classpath', sourceSets.test.runtimeClasspath.asPath
-}
-
 // Task to initialize Gauge project
 tasks.register('gaugeInit', Exec) {
     commandLine 'gauge', 'init', 'java'
     workingDir projectDir
 }
 
+// Separate task for Gauge tests
+tasks.register('gaugeTest', Exec) {
+    dependsOn testClasses
+    commandLine 'gauge', 'run', 'specs'
+    workingDir projectDir
+}
+
 // Run specific Gauge spec
 tasks.register('gaugeRun', Exec) {
     dependsOn testClasses
-
     def specPath = project.hasProperty('spec') ? project.property('spec') : 'specs'
     commandLine 'gauge', 'run', specPath
     workingDir projectDir
-
-    // Set environment variables for Gauge
-    def buildDirPath = layout.buildDirectory.get().asFile
-    environment 'GAUGE_CUSTOM_COMPILE_DIR', "${buildDirPath}/classes/java/main:${buildDirPath}/classes/java/test"
-    environment 'gauge_custom_classpath', sourceSets.test.runtimeClasspath.asPath
 }
