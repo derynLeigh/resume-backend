@@ -42,36 +42,36 @@ class ProfileServiceTest {
     @BeforeEach
     void setUp() {
         testProfile = Profile.builder()
-            .id(1L)
-            .firstName("Deryn")
-            .lastName("Cullen")
-            .email("deryn@example.com")
-            .title("Technical Product Owner")
-            .active(true)
-            .build();
+                .id(1L)
+                .firstName("Deryn")
+                .lastName("Cullen")
+                .email("deryn@example.com")
+                .title("Technical Product Owner")
+                .active(true)
+                .build();
 
         testProfileDTO = ProfileDTO.builder()
-            .id(1L)
-            .firstName("Deryn")
-            .lastName("Cullen")
-            .email("deryn@example.com")
-            .title("Technical Product Owner")
-            .active(true)
-            .build();
+                .id(1L)
+                .firstName("Deryn")
+                .lastName("Cullen")
+                .email("deryn@example.com")
+                .title("Technical Product Owner")
+                .active(true)
+                .build();
 
         createRequest = CreateProfileRequest.builder()
-            .firstName("Deryn")
-            .lastName("Cullen")
-            .email("deryn@example.com")
-            .title("Technical Product Owner")
-            .build();
+                .firstName("Deryn")
+                .lastName("Cullen")
+                .email("deryn@example.com")
+                .title("Technical Product Owner")
+                .build();
 
         updateRequest = UpdateProfileRequest.builder()
-            .firstName("Deryn")
-            .lastName("Cullen")
-            .email("deryn@example.com")
-            .title("Senior Technical Product Owner")
-            .build();
+                .firstName("Deryn")
+                .lastName("Cullen")
+                .email("deryn@example.com")
+                .title("Senior Technical Product Owner")
+                .build();
     }
 
     @Nested
@@ -105,9 +105,9 @@ class ProfileServiceTest {
 
             // When/Then
             assertThatThrownBy(() -> profileService.createProfile(createRequest))
-                .isInstanceOf(DuplicateResourceException.class)
-                .hasMessage("Profile with email deryn@example.com already exists");
-            
+                    .isInstanceOf(DuplicateResourceException.class)
+                    .hasMessage("Profile with email deryn@example.com already exists");
+
             verify(profileRepository, never()).save(any());
         }
     }
@@ -140,8 +140,8 @@ class ProfileServiceTest {
 
             // When/Then
             assertThatThrownBy(() -> profileService.getProfileById(999L))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Profile not found with id: 999");
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("Profile not found with id: 999");
         }
 
         @Test
@@ -179,7 +179,11 @@ class ProfileServiceTest {
         @DisplayName("Should get profile with all relations")
         void shouldGetProfileWithAllRelations() {
             // Given
-            when(profileRepository.findByIdWithAllRelations(1L)).thenReturn(Optional.of(testProfile));
+            when(profileRepository.findById(1L)).thenReturn(Optional.of(testProfile));
+            when(profileRepository.findByIdWithExperiences(1L)).thenReturn(Optional.of(testProfile));
+            when(profileRepository.findByIdWithEducations(1L)).thenReturn(Optional.of(testProfile));
+            when(profileRepository.findByIdWithSkills(1L)).thenReturn(Optional.of(testProfile));
+            when(profileRepository.findByIdWithCertifications(1L)).thenReturn(Optional.of(testProfile));
             when(profileMapper.toDto(any(Profile.class))).thenReturn(testProfileDTO);
 
             // When
@@ -187,7 +191,11 @@ class ProfileServiceTest {
 
             // Then
             assertThat(result).isNotNull();
-            verify(profileRepository).findByIdWithAllRelations(1L);
+            verify(profileRepository).findById(1L);
+            verify(profileRepository).findByIdWithExperiences(1L);
+            verify(profileRepository).findByIdWithEducations(1L);
+            verify(profileRepository).findByIdWithSkills(1L);
+            verify(profileRepository).findByIdWithCertifications(1L);
         }
     }
 
@@ -220,9 +228,9 @@ class ProfileServiceTest {
 
             // When/Then
             assertThatThrownBy(() -> profileService.updateProfile(999L, updateRequest))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Profile not found with id: 999");
-            
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("Profile not found with id: 999");
+
             verify(profileRepository, never()).save(any());
         }
 
@@ -231,20 +239,20 @@ class ProfileServiceTest {
         void shouldThrowExceptionWhenEmailAlreadyTaken() {
             // Given
             Profile existingProfile = Profile.builder()
-                .id(2L)
-                .email("existing@example.com")
-                .build();
-            
+                    .id(2L)
+                    .email("existing@example.com")
+                    .build();
+
             testProfile.setEmail("old@example.com");
             updateRequest.setEmail("existing@example.com");
-            
+
             when(profileRepository.findById(1L)).thenReturn(Optional.of(testProfile));
             when(profileRepository.findByEmail("existing@example.com")).thenReturn(Optional.of(existingProfile));
 
             // When/Then
             assertThatThrownBy(() -> profileService.updateProfile(1L, updateRequest))
-                .isInstanceOf(DuplicateResourceException.class)
-                .hasMessage("Email existing@example.com is already in use");
+                    .isInstanceOf(DuplicateResourceException.class)
+                    .hasMessage("Email existing@example.com is already in use");
         }
     }
 
@@ -273,9 +281,9 @@ class ProfileServiceTest {
 
             // When/Then
             assertThatThrownBy(() -> profileService.deleteProfile(999L))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Profile not found with id: 999");
-            
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("Profile not found with id: 999");
+
             verify(profileRepository, never()).deleteById(any());
         }
 

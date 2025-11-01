@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Builder Pattern Tests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-10-31T16:49:29.281Z" hostname="UKL92JV9Y26P" time="0.175">
-  <properties/>
-  <testcase name="Should build experience using builder pattern" classname="com.deryncullen.resume.model.ExperienceTest$BuilderTests" time="0.175"/>
-  <system-out><![CDATA[16:49:29.357 [Test worker] INFO org.hibernate.validator.internal.util.Version -- HV000001: Hibernate Validator 8.0.1.Final
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
