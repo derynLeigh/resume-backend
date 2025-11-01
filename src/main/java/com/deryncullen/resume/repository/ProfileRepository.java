@@ -30,23 +30,8 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     @Query("SELECT p FROM Profile p LEFT JOIN FETCH p.certifications WHERE p.id = :id")
     Optional<Profile> findByIdWithCertifications(@Param("id") Long id);
 
-    @Query("""
-        SELECT DISTINCT p FROM Profile p
-        LEFT JOIN FETCH p.experiences
-        LEFT JOIN FETCH p.educations
-        LEFT JOIN FETCH p.skills
-        LEFT JOIN FETCH p.certifications
-        WHERE p.id = :id
-    """)
-    Optional<Profile> findByIdWithAllRelations(@Param("id") Long id);
+    // Removed findByIdWithAllRelations - use separate queries in service layer instead
 
-    @Query("""
-        SELECT DISTINCT p FROM Profile p
-        LEFT JOIN FETCH p.experiences
-        LEFT JOIN FETCH p.educations
-        LEFT JOIN FETCH p.skills
-        LEFT JOIN FETCH p.certifications
-        WHERE p.active = true
-    """)
+    @Query("SELECT DISTINCT p FROM Profile p WHERE p.active = true")
     List<Profile> findAllActiveWithRelations();
 }

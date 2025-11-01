@@ -13,6 +13,7 @@ reports
 # Gradle
 .gradle/
 build/
+build.gradle.backup
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -37,25 +38,11 @@ error-logs
 .env.local
 .env.*.local
 
-# Make sure scripts are NOT ignored
-!run-app.sh
-!run-dev.sh
-!check-health.sh
-!stop-app.sh
-!view-logs.sh
-!run-unit-tests.sh
-!load-env-and-test.sh
-
-# Gauge
-reports/
-
 # Spring Boot
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-# GitHub private key
-config/github-private-key.pem
-
-# Test keys - regenerate if needed
-src/test/resources/test-github-key.pem
+libs/gauge/
+logs/
+reports/

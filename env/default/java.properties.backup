@@ -1,0 +1,17 @@
+# Gauge Java Configuration
+# Configured to work with Gradle-built projects
+
+# Don't compile - use Gradle's compiled classes
+gauge_custom_compile_dir =
+
+# Use Gradle's build output
+gauge_custom_build_path = build/classes/java/main:build/classes/java/test:build/resources/main:build/resources/test
+
+# All dependencies are copied to libs/gauge by Gradle
+gauge_additional_libs = libs/gauge/*
+
+# JVM settings
+gauge_jvm_args = -Xmx1024m
+
+# Clear state per scenario
+gauge_clear_state_level = scenario
