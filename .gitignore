@@ -13,6 +13,7 @@ reports
 # Gradle
 .gradle/
 build/
+build.gradle.backup
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -42,3 +43,6 @@ error-logs
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+libs/gauge/
+logs/
+reports/

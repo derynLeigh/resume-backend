@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Builder Pattern Tests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-11-01T00:21:49.733Z" hostname="Mac.Home" time="0.101">
+<testsuite name="Builder Pattern Tests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-11-01T09:33:49.591Z" hostname="Mac.Home" time="0.002">
   <properties/>
-  <testcase name="Should build profile using builder pattern" classname="com.deryncullen.resume.model.ProfileTest$BuilderTests" time="0.101"/>
-  <system-out><![CDATA[00:21:49.779 [Test worker] INFO org.hibernate.validator.internal.util.Version -- HV000001: Hibernate Validator 8.0.1.Final
-]]></system-out>
+  <testcase name="Should build profile using builder pattern" classname="com.deryncullen.resume.model.ProfileTest$BuilderTests" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

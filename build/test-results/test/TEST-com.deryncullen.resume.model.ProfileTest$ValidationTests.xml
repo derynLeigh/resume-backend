@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Validation Tests" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-11-01T00:21:49.865Z" hostname="Mac.Home" time="0.07">
+<testsuite name="Validation Tests" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-11-01T09:33:49.613Z" hostname="Mac.Home" time="0.033">
   <properties/>
-  <testcase name="Should fail validation when required fields are null" classname="com.deryncullen.resume.model.ProfileTest$ValidationTests" time="0.042"/>
-  <testcase name="Should fail validation with invalid URL format" classname="com.deryncullen.resume.model.ProfileTest$ValidationTests" time="0.012"/>
-  <testcase name="Should pass validation with valid data" classname="com.deryncullen.resume.model.ProfileTest$ValidationTests" time="0.008"/>
-  <testcase name="Should fail validation with invalid email format" classname="com.deryncullen.resume.model.ProfileTest$ValidationTests" time="0.007"/>
+  <testcase name="Should fail validation when required fields are null" classname="com.deryncullen.resume.model.ProfileTest$ValidationTests" time="0.013"/>
+  <testcase name="Should fail validation with invalid URL format" classname="com.deryncullen.resume.model.ProfileTest$ValidationTests" time="0.01"/>
+  <testcase name="Should pass validation with valid data" classname="com.deryncullen.resume.model.ProfileTest$ValidationTests" time="0.005"/>
+  <testcase name="Should fail validation with invalid email format" classname="com.deryncullen.resume.model.ProfileTest$ValidationTests" time="0.004"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
