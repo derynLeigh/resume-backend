@@ -87,7 +87,7 @@ public class ProfileService {
     }
 
     /**
-     * Get profile with all relations - FIXED to avoid MultipleBagFetchException
+     * Get profile with all relations (experiences, educations, skills, certifications) using separate queries to avoid Hibernate's MultipleBagFetchException
      */
     @Transactional(readOnly = true)
     public ProfileDTO getProfileWithAllRelations(Long id) {
