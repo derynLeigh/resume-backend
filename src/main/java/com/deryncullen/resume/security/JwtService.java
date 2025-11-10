@@ -12,6 +12,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -26,6 +27,9 @@ public class JwtService {
 
     @Value("${jwt.refresh-expiration}")
     private Long refreshExpiration;
+
+    // Track last token generation time to ensure uniqueness
+    private volatile long lastTokenGenerationTimeSeconds = 0;
 
     /**
      * Get expiration time in milliseconds
@@ -107,14 +111,42 @@ public class JwtService {
 
     /**
      * Create token with claims, subject, and expiration
+     * Ensures each token has a unique identifier even if generated in the same second
      */
-    private String createToken(Map<String, Object> claims, String subject, Long expirationTime) {
+    private synchronized String createToken(Map<String, Object> claims, String subject, Long expirationTime) {
+        long currentTimeMillis = System.currentTimeMillis();
+        long currentTimeSeconds = currentTimeMillis / 1000;
+
+        // JWT spec uses seconds, not milliseconds
+        // If we're in the same second as last token, wait 1 second
+        if (currentTimeSeconds <= lastTokenGenerationTimeSeconds) {
+            try {
+                // Sleep for remaining time in current second + 1ms
+                long sleepTime = 1000 - (currentTimeMillis % 1000) + 1;
+                Thread.sleep(sleepTime);
+                currentTimeMillis = System.currentTimeMillis();
+                currentTimeSeconds = currentTimeMillis / 1000;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                // If interrupted, just use current time
+                currentTimeMillis = System.currentTimeMillis();
+                currentTimeSeconds = currentTimeMillis / 1000;
+            }
+        }
+
+        lastTokenGenerationTimeSeconds = currentTimeSeconds;
+
+        // Add a unique identifier to ensure tokens are different even with same iat
+        claims.put("jti", UUID.randomUUID().toString());
+
+        log.debug("Generating token for {} with iat: {} ({}s)", subject, currentTimeMillis, currentTimeSeconds);
+
         return Jwts
                 .builder()
                 .claims(claims)
                 .subject(subject)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expirationTime))
+                .issuedAt(new Date(currentTimeMillis))
+                .expiration(new Date(currentTimeMillis + expirationTime))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -123,8 +155,15 @@ public class JwtService {
      * Validate token
      */
     public Boolean validateToken(String token, String username) {
-        final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+        try {
+            final String extractedUsername = extractUsername(token);
+            boolean isValid = extractedUsername.equals(username) && !isTokenExpired(token);
+            log.debug("Token validation for {}: {}", username, isValid);
+            return isValid;
+        } catch (Exception e) {
+            log.warn("Token validation failed: {}", e.getMessage());
+            return false;
+        }
     }
 
     /**

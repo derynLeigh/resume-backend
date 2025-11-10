@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Entity Behavior Tests" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-11-03T09:51:42.685Z" hostname="Mac.Home" time="0.018">
+<testsuite name="Entity Behavior Tests" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-11-10T20:50:33.993Z" hostname="Mac.Home" time="0.02">
   <properties/>
-  <testcase name="Should set creation timestamp on new profile" classname="com.deryncullen.resume.model.ProfileTest$EntityBehaviorTests" time="0.002"/>
+  <testcase name="Should set creation timestamp on new profile" classname="com.deryncullen.resume.model.ProfileTest$EntityBehaviorTests" time="0.003"/>
   <testcase name="Should correctly build full name" classname="com.deryncullen.resume.model.ProfileTest$EntityBehaviorTests" time="0.001"/>
   <testcase name="Should update timestamp on profile update" classname="com.deryncullen.resume.model.ProfileTest$EntityBehaviorTests" time="0.014"/>
   <testcase name="Should mark profile as active by default" classname="com.deryncullen.resume.model.ProfileTest$EntityBehaviorTests" time="0.001"/>

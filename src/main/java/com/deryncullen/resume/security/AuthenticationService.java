@@ -101,28 +101,48 @@ public class AuthenticationService {
     public AuthenticationResponse refreshToken(String refreshToken) {
         log.info("Refreshing token");
 
-        // Extract username from refresh token
-        String email = jwtService.extractUsername(refreshToken);
+        try {
+            // Extract username from refresh token
+            String email = jwtService.extractUsername(refreshToken);
 
-        // Load user
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            // Load user
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Validate refresh token
-        if (!jwtService.validateToken(refreshToken, user.getEmail())) {
+            // Validate refresh token
+            if (!jwtService.validateToken(refreshToken, user.getEmail())) {
+                log.warn("Invalid refresh token for user: {}", email);
+                throw new IllegalArgumentException("Invalid refresh token");
+            }
+
+            // Generate new access token with CURRENT timestamp
+            // Use email directly to ensure fresh token generation
+            String newAccessToken = jwtService.generateToken(user.getEmail());
+
+            log.info("Token refreshed successfully for user: {}", user.getEmail());
+
+            return AuthenticationResponse.builder()
+                    .accessToken(newAccessToken)
+                    .refreshToken(refreshToken)
+                    .tokenType("Bearer")
+                    .expiresIn(jwtService.getExpirationTime())
+                    .build();
+
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            log.warn("Refresh token expired: {}", e.getMessage());
+            throw new IllegalArgumentException("Refresh token expired");
+        } catch (io.jsonwebtoken.MalformedJwtException e) {
+            log.warn("Malformed refresh token: {}", e.getMessage());
+            throw new IllegalArgumentException("Invalid refresh token");
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            log.warn("Invalid refresh token signature: {}", e.getMessage());
+            throw new IllegalArgumentException("Invalid refresh token");
+        } catch (IllegalArgumentException e) {
+            // Re-throw IllegalArgumentException as-is
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error refreshing token: {}", e.getMessage(), e);
             throw new IllegalArgumentException("Invalid refresh token");
         }
-
-        // Generate new access token
-        String newAccessToken = jwtService.generateToken(user.getEmail());
-
-        log.info("Token refreshed successfully for user: {}", user.getEmail());
-
-        return AuthenticationResponse.builder()
-                .accessToken(newAccessToken)
-                .refreshToken(refreshToken)
-                .tokenType("Bearer")
-                .expiresIn(jwtService.getExpirationTime())
-                .build();
     }
 }

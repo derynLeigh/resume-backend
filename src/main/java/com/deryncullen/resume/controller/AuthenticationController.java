@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -53,21 +55,34 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "Refresh access token", description = "Get a new access token using refresh token")
+    @Operation(summary = "Refresh access token", description = "Generates a new access token using a valid refresh token")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Token refreshed successfully",
-                    content = @Content(schema = @Schema(implementation = AuthenticationResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Invalid refresh token")
+            @ApiResponse(responseCode = "200", description = "Token refreshed successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
     })
-    public ResponseEntity<AuthenticationResponse> refreshToken(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String authHeader) {
         log.info("Refreshing token");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                log.warn("Invalid authorization header format");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid authorization header"));
+            }
 
-        String refreshToken = authHeader.substring(7);
-        AuthenticationResponse response = authenticationService.refreshToken(refreshToken);
-        return ResponseEntity.ok(response);
+            String refreshToken = authHeader.substring(7);
+            AuthenticationResponse response = authenticationService.refreshToken(refreshToken);
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            log.warn("Token refresh failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Unexpected error during token refresh: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred during token refresh"));
+        }
     }
 }
