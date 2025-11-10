@@ -1,16 +1,19 @@
 package com.deryncullen.resume.config;
 
+import com.deryncullen.resume.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -20,61 +23,73 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
+
     @Bean
-    @Profile("!test") // Only active when NOT in test profile
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        log.info("=== CONFIGURING SECURITY FILTER CHAIN ===");
+        log.info("JWT Filter: {}", jwtAuthFilter.getClass().getSimpleName());
+        log.info("Auth Provider: {}", authenticationProvider.getClass().getSimpleName());
+
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // Public endpoints - anyone can read profiles
-                        .requestMatchers(HttpMethod.GET, "/api/profiles/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/profiles/active").permitAll()
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> {
+                    log.info("=== CONFIGURING AUTHORIZATION RULES ===");
+                    auth
+                            // Public authentication endpoints (no token needed)
+                            .requestMatchers("/auth/**").permitAll()
 
-                        // Swagger/OpenAPI endpoints
-                        .requestMatchers("/api/swagger-ui/**").permitAll()
-                        .requestMatchers("/api/api-docs/**").permitAll()
-                        .requestMatchers("/api/swagger-ui.html").permitAll()
+                            // Public profile endpoints - GET only (anyone can view profiles)
+                            .requestMatchers(HttpMethod.GET, "/profiles/**").permitAll()
 
-                        // Actuator endpoints
-                        .requestMatchers("/api/actuator/health").permitAll()
-                        .requestMatchers("/api/actuator/info").permitAll()
+                            // Swagger/OpenAPI documentation
+                            .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
 
-                        // All other endpoints require authentication
-                        .anyRequest().authenticated()
+                            // Actuator endpoints
+                            .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+
+                            // ALL OTHER REQUESTS require authentication
+                            .anyRequest().authenticated();
+
+                    log.info("=== AUTHORIZATION RULES CONFIGURED ===");
+                    log.info("Public: /auth/**, GET /profiles/**, /swagger-ui/**, /actuator/**");
+                    log.info("Protected: Everything else (POST/PUT/DELETE /profiles, etc.)");
+                })
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            log.debug("Authentication failed for: {} {}", request.getMethod(), request.getRequestURI());
+                            log.debug("Reason: {}", authException.getMessage());
+                            response.setContentType("application/json");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"" +
+                                    authException.getMessage() + "\"}");
+                        })
                 )
-                .httpBasic(basic -> {}); // Basic auth for now, will replace with JWT
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        log.info("=== JWT FILTER ADDED BEFORE UsernamePasswordAuthenticationFilter ===");
+        log.info("=== SECURITY CONFIGURATION COMPLETE ===");
 
         return http.build();
-    }
-
-    @Bean
-    @Profile("test") // Only active in test profile
-    public SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                );
-
-        return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",  // Next.js development
-                "http://localhost:3001",  // Alternative port
-                "http://localhost:8080"   // Local development
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://localhost:8080",
+                "http://localhost:8081"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -82,7 +97,7 @@ public class SecurityConfig {
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }

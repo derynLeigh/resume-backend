@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Builder Pattern Tests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-11-01T09:33:49.591Z" hostname="Mac.Home" time="0.002">
+<testsuite name="Builder Pattern Tests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-11-10T20:50:33.990Z" hostname="Mac.Home" time="0.001">
   <properties/>
-  <testcase name="Should build profile using builder pattern" classname="com.deryncullen.resume.model.ProfileTest$BuilderTests" time="0.002"/>
+  <testcase name="Should build profile using builder pattern" classname="com.deryncullen.resume.model.ProfileTest$BuilderTests" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
