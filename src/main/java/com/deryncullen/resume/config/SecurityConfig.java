@@ -4,6 +4,7 @@ import com.deryncullen.resume.security.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,9 +31,13 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
+    @Value("${security.permit-all:false}")
+    private boolean permitAll;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("=== CONFIGURING SECURITY FILTER CHAIN ===");
+        log.info("Permit All Mode: {}", permitAll);
         log.info("JWT Filter: {}", jwtAuthFilter.getClass().getSimpleName());
         log.info("Auth Provider: {}", authenticationProvider.getClass().getSimpleName());
 
@@ -40,45 +45,52 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> {
-                    log.info("=== CONFIGURING AUTHORIZATION RULES ===");
-                    auth
-                            // Public authentication endpoints (no token needed)
-                            .requestMatchers("/auth/**").permitAll()
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-                            // Public profile endpoints - GET only (anyone can view profiles)
-                            .requestMatchers(HttpMethod.GET, "/profiles/**").permitAll()
+        if (permitAll) {
+            // Test mode - permit all requests
+            log.info("=== CONFIGURING TEST MODE - PERMIT ALL ===");
+            http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+        } else {
+            // Production mode - JWT authentication
+            log.info("=== CONFIGURING PRODUCTION MODE - JWT AUTHENTICATION ===");
+            http.authorizeHttpRequests(auth -> {
+                        log.info("=== CONFIGURING AUTHORIZATION RULES ===");
+                        auth
+                                // Public authentication endpoints (no token needed)
+                                .requestMatchers("/auth/**").permitAll()
 
-                            // Swagger/OpenAPI documentation
-                            .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
+                                // Public profile endpoints - GET only (anyone can view profiles)
+                                .requestMatchers(HttpMethod.GET, "/profiles/**").permitAll()
 
-                            // Actuator endpoints
-                            .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                                // Swagger/OpenAPI documentation
+                                .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
 
-                            // ALL OTHER REQUESTS require authentication
-                            .anyRequest().authenticated();
+                                // Actuator endpoints
+                                .requestMatchers("/actuator/health", "/actuator/info").permitAll()
 
-                    log.info("=== AUTHORIZATION RULES CONFIGURED ===");
-                    log.info("Public: /auth/**, GET /profiles/**, /swagger-ui/**, /actuator/**");
-                    log.info("Protected: Everything else (POST/PUT/DELETE /profiles, etc.)");
-                })
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            log.debug("Authentication failed for: {} {}", request.getMethod(), request.getRequestURI());
-                            log.debug("Reason: {}", authException.getMessage());
-                            response.setContentType("application/json");
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"" +
-                                    authException.getMessage() + "\"}");
-                        })
-                )
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                                // ALL OTHER REQUESTS require authentication
+                                .anyRequest().authenticated();
 
-        log.info("=== JWT FILTER ADDED BEFORE UsernamePasswordAuthenticationFilter ===");
+                        log.info("=== AUTHORIZATION RULES CONFIGURED ===");
+                        log.info("Public: /auth/**, GET /profiles/**, /swagger-ui/**, /actuator/**");
+                        log.info("Protected: Everything else (POST/PUT/DELETE /profiles, etc.)");
+                    })
+                    .exceptionHandling(exception -> exception
+                            .authenticationEntryPoint((request, response, authException) -> {
+                                log.debug("Authentication failed for: {} {}", request.getMethod(), request.getRequestURI());
+                                log.debug("Reason: {}", authException.getMessage());
+                                response.setContentType("application/json");
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"" +
+                                        authException.getMessage() + "\"}");
+                            })
+                    )
+                    .authenticationProvider(authenticationProvider)
+                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        }
+
         log.info("=== SECURITY CONFIGURATION COMPLETE ===");
-
         return http.build();
     }
 
