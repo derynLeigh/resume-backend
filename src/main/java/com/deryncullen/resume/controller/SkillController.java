@@ -48,6 +48,7 @@ public class SkillController {
         SkillDTO created = skillService.createSkill(profileId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
+    @GetMapping
     public ResponseEntity<List<SkillDTO>> getSkills(
             @Parameter(description = "Profile ID") @PathVariable Long profileId) {
         log.info("Fetching skills for profile ID: {}", profileId);

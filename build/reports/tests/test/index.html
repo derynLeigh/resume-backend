@@ -20,13 +20,13 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">12</div>
+<div class="counter">9</div>
 <p>tests</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">0</div>
+<div class="counter">9</div>
 <p>failures</p>
 </div>
 </td>
@@ -38,7 +38,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.871s</div>
+<div class="counter">0.013s</div>
 <p>duration</p>
 </div>
 </td>
@@ -47,8 +47,8 @@
 </div>
 </td>
 <td>
-<div class="infoBox success" id="successRate">
-<div class="percent">100%</div>
+<div class="infoBox failures" id="successRate">
+<div class="percent">0%</div>
 <p>successful</p>
 </div>
 </td>
@@ -58,12 +58,56 @@
 <div class="tab-container">
 <ul class="tabLinks">
 <li>
+<a href="#">Failed tests</a>
+</li>
+<li>
 <a href="#">Packages</a>
 </li>
 <li>
 <a href="#">Classes</a>
 </li>
 </ul>
+<div class="tab">
+<h2>Failed tests</h2>
+<ul class="linkList">
+<li>
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$CreateSkillTests.html">POST /profiles/{profileId}/skills</a>.
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$CreateSkillTests.html#shouldCreateSkill()">Should create skill and return 201</a>
+</li>
+<li>
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$CreateSkillTests.html">POST /profiles/{profileId}/skills</a>.
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$CreateSkillTests.html#shouldReturn400WhenValidationFails()">Should return 400 when validation fails</a>
+</li>
+<li>
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$CreateSkillTests.html">POST /profiles/{profileId}/skills</a>.
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$CreateSkillTests.html#shouldReturn403WhenNotAdmin()">Should return 403 when user lacks ADMIN role</a>
+</li>
+<li>
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$DeleteSkillTests.html">DELETE /profiles/{profileId}/skills/{skillId}</a>.
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$DeleteSkillTests.html#shouldDeleteSkill()">Should delete skill and return 204</a>
+</li>
+<li>
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$GetPrimarySkillsTests.html">GET /profiles/{profileId}/skills/primary</a>.
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$GetPrimarySkillsTests.html#shouldGetPrimarySkills()">Should get primary skills and return 200</a>
+</li>
+<li>
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$GetSkillByIdTests.html">GET /profiles/{profileId}/skills/{skillId}</a>.
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$GetSkillByIdTests.html#shouldGetSkillById()">Should get skill by ID and return 200</a>
+</li>
+<li>
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$GetSkillsTests.html">GET /profiles/{profileId}/skills</a>.
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$GetSkillsTests.html#shouldGetAllSkills()">Should get all skills and return 200</a>
+</li>
+<li>
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$ReorderSkillsTests.html">PUT /profiles/{profileId}/skills/reorder</a>.
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$ReorderSkillsTests.html#shouldReorderSkills()">Should reorder skills and return 204</a>
+</li>
+<li>
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$UpdateSkillTests.html">PUT /profiles/{profileId}/skills/{skillId}</a>.
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$UpdateSkillTests.html#shouldUpdateSkill()">Should update skill and return 200</a>
+</li>
+</ul>
+</div>
 <div class="tab">
 <h2>Packages</h2>
 <table>
@@ -79,14 +123,14 @@
 </thead>
 <tbody>
 <tr>
-<td class="success">
-<a href="packages/com.deryncullen.resume.service.html">com.deryncullen.resume.service</a>
+<td class="failures">
+<a href="packages/com.deryncullen.resume.controller.html">com.deryncullen.resume.controller</a>
 </td>
-<td>12</td>
+<td>9</td>
+<td>9</td>
 <td>0</td>
-<td>0</td>
-<td>0.871s</td>
-<td class="success">100%</td>
+<td>0.013s</td>
+<td class="failures">0%</td>
 </tr>
 </tbody>
 </table>
@@ -107,53 +151,83 @@
 <tbody>
 <tr>
 <td class="success">
-<a href="classes/com.deryncullen.resume.service.SkillServiceTest$CreateSkillTests.html">com.deryncullen.resume.service.SkillServiceTest$CreateSkillTests</a>
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest.html">com.deryncullen.resume.controller.SkillControllerTest</a>
+</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>-</td>
+<td class="success">-</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$CreateSkillTests.html">com.deryncullen.resume.controller.SkillControllerTest$CreateSkillTests</a>
 </td>
 <td>3</td>
+<td>3</td>
 <td>0</td>
-<td>0</td>
-<td>0.009s</td>
-<td class="success">100%</td>
+<td>0.003s</td>
+<td class="failures">0%</td>
 </tr>
 <tr>
-<td class="success">
-<a href="classes/com.deryncullen.resume.service.SkillServiceTest$DeleteSkillTests.html">com.deryncullen.resume.service.SkillServiceTest$DeleteSkillTests</a>
-</td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0.035s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
-<a href="classes/com.deryncullen.resume.service.SkillServiceTest$GetSkillsTests.html">com.deryncullen.resume.service.SkillServiceTest$GetSkillsTests</a>
-</td>
-<td>4</td>
-<td>0</td>
-<td>0</td>
-<td>0.014s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
-<a href="classes/com.deryncullen.resume.service.SkillServiceTest$ReorderSkillsTests.html">com.deryncullen.resume.service.SkillServiceTest$ReorderSkillsTests</a>
+<td class="failures">
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$DeleteSkillTests.html">com.deryncullen.resume.controller.SkillControllerTest$DeleteSkillTests</a>
 </td>
 <td>1</td>
+<td>1</td>
 <td>0</td>
-<td>0</td>
-<td>0.808s</td>
-<td class="success">100%</td>
+<td>0.001s</td>
+<td class="failures">0%</td>
 </tr>
 <tr>
-<td class="success">
-<a href="classes/com.deryncullen.resume.service.SkillServiceTest$UpdateSkillTests.html">com.deryncullen.resume.service.SkillServiceTest$UpdateSkillTests</a>
+<td class="failures">
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$GetPrimarySkillsTests.html">com.deryncullen.resume.controller.SkillControllerTest$GetPrimarySkillsTests</a>
 </td>
-<td>2</td>
+<td>1</td>
+<td>1</td>
 <td>0</td>
+<td>0.001s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$GetSkillByIdTests.html">com.deryncullen.resume.controller.SkillControllerTest$GetSkillByIdTests</a>
+</td>
+<td>1</td>
+<td>1</td>
 <td>0</td>
-<td>0.005s</td>
-<td class="success">100%</td>
+<td>0s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$GetSkillsTests.html">com.deryncullen.resume.controller.SkillControllerTest$GetSkillsTests</a>
+</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$ReorderSkillsTests.html">com.deryncullen.resume.controller.SkillControllerTest$ReorderSkillsTests</a>
+</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0.007s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/com.deryncullen.resume.controller.SkillControllerTest$UpdateSkillTests.html">com.deryncullen.resume.controller.SkillControllerTest$UpdateSkillTests</a>
+</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="failures">0%</td>
 </tr>
 </tbody>
 </table>
@@ -166,7 +240,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 8.14</a> at 11 Nov 2025, 16:37:22</p>
+<a href="https://www.gradle.org">Gradle 8.14</a> at 12 Nov 2025, 14:32:56</p>
 </div>
 </div>
 </body>
