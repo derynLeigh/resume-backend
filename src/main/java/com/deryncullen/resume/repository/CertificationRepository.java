@@ -33,6 +33,31 @@ public interface CertificationRepository extends JpaRepository<Certification, Lo
     List<Certification> findByProfileIdAndDoesNotExpireTrue(Long profileId);
 
     /**
+     * Check if a certification already exists for a profile
+     * Used to prevent duplicate certifications
+     */
+    boolean existsByProfileIdAndNameAndIssuingOrganization(
+            Long profileId,
+            String name,
+            String issuingOrganization
+    );
+
+    /**
+     * Find certifications by issuing organization
+     * Useful for grouping certifications by vendor (e.g. all AWS certs)
+     */
+    List<Certification> findByProfileIdAndIssuingOrganization(
+            Long profileId,
+            String issuingOrganization
+    );
+
+    /**
+     * Find certifications ordered by display order, then by date
+     * For consistent UI presentation
+     */
+    List<Certification> findByProfileIdOrderByDisplayOrderAscDateObtainedDesc(Long profileId);
+
+    /**
      * Find certifications expiring before a certain date
      */
     @Query("SELECT c FROM Certification c WHERE c.profile.id = :profileId " +
