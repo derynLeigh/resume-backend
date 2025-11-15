@@ -49,7 +49,7 @@ public class CertificationService {
         // Set display order if not provided
         if (certification.getDisplayOrder() == null) {
             long count = certificationRepository.countByProfileId(profileId);
-            certification.setDisplayOrder((int) count + 1);
+            certification.setDisplayOrder(Math.toIntExact(count + 1));
         }
 
         Certification saved = certificationRepository.save(certification);
@@ -144,12 +144,9 @@ public class CertificationService {
 
         profileMapper.updateCertificationFromDto(certification, updateDTO);
 
-        // Validate expiration date if changed
-        if (updateDTO.getExpirationDate() != null && updateDTO.getDateObtained() != null) {
-            if (!updateDTO.isDoesNotExpire() &&
-                    updateDTO.getExpirationDate().isBefore(updateDTO.getDateObtained())) {
-                throw new IllegalArgumentException("Expiration date must be after date obtained");
-            }
+        // Validate using the entity's built-in validation method
+        if (!certification.isExpirationDateValid()) {
+            throw new IllegalArgumentException("Expiration date must be after date obtained");
         }
 
         Certification saved = certificationRepository.save(certification);

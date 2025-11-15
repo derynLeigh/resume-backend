@@ -1,0 +1,277 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.deryncullen'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Database
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.liquibase:liquibase-core'
+
+    // Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // Utilities
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+    // JWT for authentication
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    // Testing Dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'io.rest-assured:rest-assured'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+    testImplementation 'org.assertj:assertj-core'
+
+    // Explicitly declare JUnit Platform Launcher
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Gauge for BDD
+    testImplementation 'com.thoughtworks.gauge:gauge-java:0.13.0'
+
+    // H2 for unit tests
+    testRuntimeOnly 'com.h2database:h2'
+}
+
+// Configure Java compilation
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += [
+            '-Xlint:unchecked',
+            '-Xlint:deprecation',
+            '-Amapstruct.suppressGeneratorTimestamp=true',
+            '-Amapstruct.defaultComponentModel=spring'
+    ]
+}
+
+// Main test task
+tasks.named('test') {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = false
+    }
+
+    maxHeapSize = '1G'
+}
+
+// Unit tests only
+tasks.register('unitTest', Test) {
+    description = 'Run unit tests only'
+    group = 'verification'
+
+    useJUnitPlatform {
+        excludeTags 'integration'
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
+// Integration tests only
+tasks.register('integrationTest', Test) {
+    description = 'Run integration tests only'
+    group = 'verification'
+
+    useJUnitPlatform {
+        includeTags 'integration'
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+
+    shouldRunAfter test
+}
+
+// Improved Gauge test task with real-time output
+tasks.register('gaugeTest', Exec) {
+    description = 'Run Gauge BDD tests'
+    group = 'verification'
+
+    dependsOn testClasses
+
+    workingDir = projectDir
+
+    def gaugeCmd = System.getProperty('os.name').toLowerCase().contains('windows') ? 'gauge.exe' : 'gauge'
+
+    commandLine gaugeCmd, 'run', '--verbose', 'specs'
+
+    // Show output in real-time
+    standardOutput = System.out
+    errorOutput = System.err
+
+    // Don't immediately fail - show helpful message
+    ignoreExitValue = true
+
+    doLast {
+        if (execResult.exitValue != 0) {
+            def message = """
+╔════════════════════════════════════════════════════════════════════
+║ Gauge Tests Failed (exit code: ${execResult.exitValue})
+╠════════════════════════════════════════════════════════════════════
+║ 
+║ Common Issues:
+║ 
+║ 1. PostgreSQL not running
+║    → docker run --name resume-postgres -p 5432:5432 \\
+║        -e POSTGRES_DB=resume_db -e POSTGRES_USER=resume_user \\
+║        -e POSTGRES_PASSWORD=resume_password -d postgres:14-alpine
+║ 
+║ 2. Port 8081 already in use
+║    → lsof -i :8081 | grep LISTEN
+║    → kill -9 <PID>
+║ 
+║ 3. Gauge not properly installed
+║    → gauge version
+║    → gauge install java
+║ 
+║ 4. Test compilation issues
+║    → ./gradlew cleanTest testClasses
+║ 
+║ View detailed report:
+║ → open reports/html-report/index.html
+║ 
+╚════════════════════════════════════════════════════════════════════
+"""
+            throw new GradleException(message)
+        }
+    }
+}
+
+// Run specific spec
+tasks.register('gaugeRun', Exec) {
+    description = 'Run specific Gauge spec (use -Pspec=path/to/spec)'
+    group = 'verification'
+
+    dependsOn testClasses
+    workingDir = projectDir
+
+    def gaugeCmd = System.getProperty('os.name').toLowerCase().contains('windows') ? 'gauge.exe' : 'gauge'
+    def specPath = project.hasProperty('spec') ? project.property('spec') : 'specs'
+
+    commandLine gaugeCmd, 'run', '--verbose', specPath
+
+    standardOutput = System.out
+    errorOutput = System.err
+    ignoreExitValue = true
+
+    doLast {
+        if (execResult.exitValue != 0) {
+            throw new GradleException("Gauge spec '${specPath}' failed")
+        }
+    }
+}
+
+// List all specs
+tasks.register('gaugeList', Exec) {
+    description = 'List all Gauge specs'
+    group = 'verification'
+
+    workingDir = projectDir
+    def gaugeCmd = System.getProperty('os.name').toLowerCase().contains('windows') ? 'gauge.exe' : 'gauge'
+
+    commandLine gaugeCmd, 'list', 'specs'
+    standardOutput = System.out
+    errorOutput = System.err
+}
+
+// Validate specs
+tasks.register('gaugeValidate', Exec) {
+    description = 'Validate Gauge specs'
+    group = 'verification'
+
+    workingDir = projectDir
+    def gaugeCmd = System.getProperty('os.name').toLowerCase().contains('windows') ? 'gauge.exe' : 'gauge'
+
+    commandLine gaugeCmd, 'validate', 'specs'
+    standardOutput = System.out
+    errorOutput = System.err
+}
+
+// Check Gauge version
+tasks.register('gaugeVersion', Exec) {
+    description = 'Check Gauge installation'
+    group = 'help'
+
+    workingDir = projectDir
+    def gaugeCmd = System.getProperty('os.name').toLowerCase().contains('windows') ? 'gauge.exe' : 'gauge'
+
+    commandLine gaugeCmd, 'version'
+    standardOutput = System.out
+    errorOutput = System.err
+    ignoreExitValue = true
+
+    doLast {
+        if (execResult.exitValue != 0) {
+            println """
+❌ Gauge not found!
+
+Install Gauge:
+• macOS:   brew install gauge
+• Linux:   curl -SsL https://downloads.gauge.org/stable | sh  
+• Windows: choco install gauge
+
+Then: gauge install java
+"""
+        }
+    }
+}
+
+tasks.register('copyGaugeDependencies', Copy) {
+    from configurations.testRuntimeClasspath
+    into 'libs/gauge'
+}
+
+// Code coverage
+tasks.register('jacocoTestReport', JacocoReport) {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+// Build doesn't include gaugeTest by default
+build {
+    dependsOn test
+}
