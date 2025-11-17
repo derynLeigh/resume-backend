@@ -202,9 +202,11 @@ class JwtServiceTest {
                 Thread.currentThread().interrupt();
             }
 
-            // When/Then - Should throw ExpiredJwtException when trying to validate
-            assertThatThrownBy(() -> shortLivedService.validateToken(token, testUser.getEmail()))
-                    .isInstanceOf(ExpiredJwtException.class);
+            // When - validateToken catches exceptions and returns false
+            Boolean isValid = shortLivedService.validateToken(token, testUser.getEmail());
+
+            // Then - Should return false for expired token
+            assertThat(isValid).isFalse();
         }
 
         @Test
