@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,8 +50,12 @@ public class CertificationService {
 
         // Set display order if not provided
         if (certification.getDisplayOrder() == null) {
-            long count = certificationRepository.countByProfileId(profileId);
-            certification.setDisplayOrder(Math.toIntExact(count + 1));
+            Integer maxOrder = certificationRepository.findMaxDisplayOrderByProfileId(profileId)
+                    .orElse(0);
+            if (maxOrder == Integer.MAX_VALUE) {
+                throw new IllegalStateException("Display order has reached maximum value");
+            }
+            certification.setDisplayOrder(maxOrder + 1);
         }
 
         Certification saved = certificationRepository.save(certification);
@@ -193,17 +199,39 @@ public class CertificationService {
     public void updateCertificationOrder(Long profileId, List<Long> certificationIds) {
         log.debug("Updating certification order for profile ID: {}", profileId);
 
-        for (int i = 0; i < certificationIds.size(); i++) {
-            Long certId = certificationIds.get(i);
-            Certification cert = certificationRepository
-                    .findByIdAndProfileId(certId, profileId)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Certification not found with ID: " + certId
-                    ));
-            cert.setDisplayOrder(i + 1);
-            certificationRepository.save(cert);
+        // Fetch all certifications at once
+        List<Certification> certifications = certificationRepository.findAllById(certificationIds);
+
+        // Validate all certifications belong to the specified profile
+        List<Certification> profileCertifications = certifications.stream()
+                .filter(cert -> cert.getProfile().getId().equals(profileId))
+                .collect(java.util.stream.Collectors.toList());
+
+        // Check if all requested certifications were found and belong to the profile
+        if (profileCertifications.size() != certificationIds.size()) {
+            throw new ResourceNotFoundException(
+                    String.format("Some certifications not found or don't belong to profile %d. " +
+                                    "Requested: %d, Found: %d",
+                            profileId, certificationIds.size(), profileCertifications.size())
+            );
         }
 
-        log.info("Updated certification order for profile ID {}", profileId);
+        // Create a map for O(1) lookup of certifications by ID
+        java.util.Map<Long, Certification> certMap = profileCertifications.stream()
+                .collect(java.util.stream.Collectors.toMap(Certification::getId, cert -> cert));
+
+        // Update display orders based on the position in the list
+        for (int i = 0; i < certificationIds.size(); i++) {
+            Certification cert = certMap.get(certificationIds.get(i));
+            if (cert != null) {
+                cert.setDisplayOrder(i + 1);
+            }
+        }
+
+        // Batch save all updated certifications
+        certificationRepository.saveAll(profileCertifications);
+
+        log.info("Updated certification order for profile ID {} - {} certifications reordered",
+                profileId, profileCertifications.size());
     }
 }

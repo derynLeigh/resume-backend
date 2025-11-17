@@ -15,12 +15,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -44,12 +43,10 @@ class CertificationControllerTest {
     @MockBean
     private CertificationService certificationService;
 
-    // Mock the security beans that JwtAuthenticationFilter depends on
+    // Required for Spring context initialization - JwtAuthenticationFilter needs this bean
+    // even though filters are disabled. IDE may warn it's unused, but it's necessary at runtime.
     @MockBean
     private JwtService jwtService;
-
-    @MockBean
-    private UserDetailsService userDetailsService;
 
     private CertificationDTO testCertificationDTO;
 
@@ -154,7 +151,7 @@ class CertificationControllerTest {
         void shouldGetAllCertifications() throws Exception {
             // Given
             Long profileId = 1L;
-            List<CertificationDTO> certifications = Arrays.asList(testCertificationDTO);
+            List<CertificationDTO> certifications = Collections.singletonList(testCertificationDTO);
 
             when(certificationService.getCertificationsByProfileId(profileId))
                     .thenReturn(certifications);
@@ -176,7 +173,7 @@ class CertificationControllerTest {
                     .name("Expired Cert")
                     .expired(true)
                     .build();
-            List<CertificationDTO> expiredCerts = Arrays.asList(expiredCert);
+            List<CertificationDTO> expiredCerts = Collections.singletonList(expiredCert);
 
             when(certificationService.getExpiredCertifications(profileId))
                     .thenReturn(expiredCerts);
@@ -198,7 +195,7 @@ class CertificationControllerTest {
                     .name("Expiring Soon Cert")
                     .expiringSoon(true)
                     .build();
-            List<CertificationDTO> expiringSoonCerts = Arrays.asList(expiringSoonCert);
+            List<CertificationDTO> expiringSoonCerts = Collections.singletonList(expiringSoonCert);
 
             when(certificationService.getCertificationsExpiringSoon(profileId))
                     .thenReturn(expiringSoonCerts);
@@ -221,7 +218,7 @@ class CertificationControllerTest {
         void shouldUpdateCertificationSuccessfully() throws Exception {
             // Given
             Long profileId = 1L;
-            Long certId = 1L;
+            long certId = 1L;
             CertificationDTO updateDTO = CertificationDTO.builder()
                     .description("Updated description")
                     .build();
@@ -249,7 +246,7 @@ class CertificationControllerTest {
         void shouldReturn404WhenCertificationNotFoundForUpdate() throws Exception {
             // Given
             Long profileId = 1L;
-            Long certId = 999L;
+            long certId = 999L;
             CertificationDTO updateDTO = CertificationDTO.builder().build();
 
             when(certificationService.updateCertification(profileId, certId, updateDTO))
@@ -274,7 +271,7 @@ class CertificationControllerTest {
         void shouldDeleteCertificationSuccessfully() throws Exception {
             // Given
             Long profileId = 1L;
-            Long certId = 1L;
+            long certId = 1L;
 
             doNothing().when(certificationService).deleteCertification(profileId, certId);
 
@@ -291,7 +288,7 @@ class CertificationControllerTest {
         void shouldReturn404WhenCertificationNotFoundForDelete() throws Exception {
             // Given
             Long profileId = 1L;
-            Long certId = 999L;
+            long certId = 999L;
 
             doThrow(new ResourceNotFoundException("Certification not found"))
                     .when(certificationService).deleteCertification(profileId, certId);
