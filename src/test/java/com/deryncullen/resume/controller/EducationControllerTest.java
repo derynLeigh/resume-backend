@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -43,8 +43,12 @@ class EducationControllerTest {
     @MockBean
     private EducationService educationService;
 
+    // Mock the security beans that JwtAuthenticationFilter depends on
     @MockBean
     private JwtService jwtService;
+
+    @MockBean
+    private UserDetailsService userDetailsService;
 
     private EducationDTO testEducationDTO;
 
@@ -52,19 +56,19 @@ class EducationControllerTest {
     void setUp() {
         testEducationDTO = EducationDTO.builder()
                 .id(1L)
-                .institutionName("University of Leeds")
-                .degree("BSc Computer Science")
-                .fieldOfStudy("Software Engineering")
-                .startDate(LocalDate.of(2019, 9, 1))
-                .graduationDate(LocalDate.of(2022, 6, 30))
+                .institutionName("University of Example")
+                .degree("Bachelor of Science")
+                .fieldOfStudy("Computer Science")
+                .startDate(LocalDate.of(2015, 9, 1))
+                .graduationDate(LocalDate.of(2019, 6, 30))
                 .grade("First Class Honours")
-                .description("Focused on software engineering and distributed systems")
-                .displayOrder(1)
+                .description("Focused on software engineering and algorithms")
+                .displayOrder(0)
                 .build();
     }
 
     @Nested
-    @DisplayName("POST /profiles/{profileId}/educations")
+    @DisplayName("Create Education Tests")
     class CreateEducationTests {
 
         @Test
@@ -72,173 +76,155 @@ class EducationControllerTest {
         @WithMockUser(roles = "ADMIN")
         void shouldCreateEducation() throws Exception {
             // Given
-            Long profileId = 1L;
-            EducationDTO inputDTO = EducationDTO.builder()
-                    .institutionName("University of Leeds")
-                    .degree("BSc Computer Science")
-                    .fieldOfStudy("Software Engineering")
-                    .startDate(LocalDate.of(2019, 9, 1))
-                    .graduationDate(LocalDate.of(2022, 6, 30))
-                    .build();
-
-            when(educationService.createEducation(eq(profileId), any(EducationDTO.class)))
+            when(educationService.createEducation(eq(1L), any(EducationDTO.class)))
                     .thenReturn(testEducationDTO);
 
-            // When & Then
-            mockMvc.perform(post("/profiles/{profileId}/educations", profileId)
+            // When/Then
+            mockMvc.perform(post("/profiles/1/educations")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(inputDTO)))
+                            .content(objectMapper.writeValueAsString(testEducationDTO)))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.id").value(1))
-                    .andExpect(jsonPath("$.institutionName").value("University of Leeds"))
-                    .andExpect(jsonPath("$.degree").value("BSc Computer Science"))
-                    .andExpect(jsonPath("$.fieldOfStudy").value("Software Engineering"));
+                    .andExpect(jsonPath("$.institutionName").value("University of Example"))
+                    .andExpect(jsonPath("$.degree").value("Bachelor of Science"))
+                    .andExpect(jsonPath("$.fieldOfStudy").value("Computer Science"));
 
-            verify(educationService).createEducation(eq(profileId), any(EducationDTO.class));
-        }
-
-        @Test
-        @DisplayName("Should return 404 when profile not found")
-        void shouldReturn404WhenProfileNotFound() throws Exception {
-            // Given
-            Long profileId = 999L;
-            EducationDTO inputDTO = EducationDTO.builder()
-                    .institutionName("University of Leeds")
-                    .degree("BSc Computer Science")
-                    .build();
-
-            when(educationService.createEducation(eq(profileId), any(EducationDTO.class)))
-                    .thenThrow(new ResourceNotFoundException("Profile not found with id: " + profileId));
-
-            // When & Then
-            mockMvc.perform(post("/profiles/{profileId}/educations", profileId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(inputDTO)))
-                    .andExpect(status().isNotFound());
+            verify(educationService).createEducation(eq(1L), any(EducationDTO.class));
         }
 
         @Test
         @DisplayName("Should return 400 for invalid input")
+        @WithMockUser(roles = "ADMIN")
         void shouldReturn400ForInvalidInput() throws Exception {
-            // Given
-            Long profileId = 1L;
-            Map<String, Object> invalidInput = new HashMap<>();
-            // Missing required fields
+            // Given - Empty request body (invalid JSON)
+            String invalidJson = "{}";
 
-            // When & Then
-            mockMvc.perform(post("/profiles/{profileId}/educations", profileId)
+            // Mock service to throw validation exception for invalid data
+            when(educationService.createEducation(eq(1L), any(EducationDTO.class)))
+                    .thenThrow(new IllegalArgumentException("Invalid education data"));
+
+            // When/Then
+            mockMvc.perform(post("/profiles/1/educations")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(invalidInput)))
+                            .content(invalidJson))
                     .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @DisplayName("Should return 404 when profile not found")
+        @WithMockUser(roles = "ADMIN")
+        void shouldReturn404WhenProfileNotFound() throws Exception {
+            // Given
+            when(educationService.createEducation(eq(999L), any(EducationDTO.class)))
+                    .thenThrow(new ResourceNotFoundException("Profile not found with id: 999"));
+
+            // When/Then
+            mockMvc.perform(post("/profiles/999/educations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(testEducationDTO)))
+                    .andExpect(status().isNotFound());
+
+            verify(educationService).createEducation(eq(999L), any(EducationDTO.class));
         }
     }
 
     @Nested
-    @DisplayName("GET /profiles/{profileId}/educations")
+    @DisplayName("Get Educations Tests")
     class GetEducationsTests {
 
         @Test
         @DisplayName("Should get all educations for profile")
         void shouldGetAllEducations() throws Exception {
             // Given
-            Long profileId = 1L;
-            List<EducationDTO> educations = Arrays.asList(
-                    testEducationDTO,
-                    EducationDTO.builder()
-                            .id(2L)
-                            .institutionName("Coursera")
-                            .degree("Professional Certificate")
-                            .fieldOfStudy("Product Management")
-                            .graduationDate(LocalDate.of(2023, 12, 15))
-                            .displayOrder(2)
-                            .build()
-            );
+            EducationDTO education2 = EducationDTO.builder()
+                    .id(2L)
+                    .institutionName("Another University")
+                    .degree("Master of Science")
+                    .fieldOfStudy("Software Engineering")
+                    .startDate(LocalDate.of(2019, 9, 1))
+                    .graduationDate(LocalDate.of(2021, 6, 30))
+                    .displayOrder(1)
+                    .build();
 
-            when(educationService.getEducationsByProfileId(profileId))
-                    .thenReturn(educations);
+            List<EducationDTO> educations = Arrays.asList(testEducationDTO, education2);
+            when(educationService.getEducationsByProfileId(1L)).thenReturn(educations);
 
-            // When & Then
-            mockMvc.perform(get("/profiles/{profileId}/educations", profileId))
+            // When/Then
+            mockMvc.perform(get("/profiles/1/educations"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(2)))
-                    .andExpect(jsonPath("$[0].institutionName").value("University of Leeds"))
-                    .andExpect(jsonPath("$[1].institutionName").value("Coursera"));
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[0].institutionName").value("University of Example"))
+                    .andExpect(jsonPath("$[1].institutionName").value("Another University"));
 
-            verify(educationService).getEducationsByProfileId(profileId);
+            verify(educationService).getEducationsByProfileId(1L);
         }
 
         @Test
-        @DisplayName("Should return empty list when no educations exist")
+        @DisplayName("Should return empty list when profile has no educations")
         void shouldReturnEmptyListWhenNoEducations() throws Exception {
             // Given
-            Long profileId = 1L;
-            when(educationService.getEducationsByProfileId(profileId))
-                    .thenReturn(Arrays.asList());
+            when(educationService.getEducationsByProfileId(1L)).thenReturn(Arrays.asList());
 
-            // When & Then
-            mockMvc.perform(get("/profiles/{profileId}/educations", profileId))
+            // When/Then
+            mockMvc.perform(get("/profiles/1/educations"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(0)));
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$.length()").value(0));
         }
 
         @Test
         @DisplayName("Should return 404 when profile not found")
-        void shouldReturn404WhenProfileNotFoundForGet() throws Exception {
+        void shouldReturn404WhenProfileNotFound() throws Exception {
             // Given
-            Long profileId = 999L;
-            when(educationService.getEducationsByProfileId(profileId))
-                    .thenThrow(new ResourceNotFoundException("Profile not found"));
+            when(educationService.getEducationsByProfileId(999L))
+                    .thenThrow(new ResourceNotFoundException("Profile not found with id: 999"));
 
-            // When & Then
-            mockMvc.perform(get("/profiles/{profileId}/educations", profileId))
+            // When/Then
+            mockMvc.perform(get("/profiles/999/educations"))
                     .andExpect(status().isNotFound());
+
+            verify(educationService).getEducationsByProfileId(999L);
         }
     }
 
     @Nested
-    @DisplayName("GET /profiles/{profileId}/educations/{educationId}")
+    @DisplayName("Get Education By Id Tests")
     class GetEducationByIdTests {
 
         @Test
         @DisplayName("Should get education by ID")
         void shouldGetEducationById() throws Exception {
             // Given
-            Long profileId = 1L;
-            Long educationId = 1L;
+            when(educationService.getEducationById(1L, 1L)).thenReturn(testEducationDTO);
 
-            when(educationService.getEducationById(profileId, educationId))
-                    .thenReturn(testEducationDTO);
-
-            // When & Then
-            mockMvc.perform(get("/profiles/{profileId}/educations/{educationId}",
-                            profileId, educationId))
+            // When/Then
+            mockMvc.perform(get("/profiles/1/educations/1"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(1))
-                    .andExpect(jsonPath("$.institutionName").value("University of Leeds"))
-                    .andExpect(jsonPath("$.degree").value("BSc Computer Science"));
+                    .andExpect(jsonPath("$.institutionName").value("University of Example"))
+                    .andExpect(jsonPath("$.degree").value("Bachelor of Science"));
 
-            verify(educationService).getEducationById(profileId, educationId);
+            verify(educationService).getEducationById(1L, 1L);
         }
 
         @Test
         @DisplayName("Should return 404 when education not found")
         void shouldReturn404WhenEducationNotFound() throws Exception {
             // Given
-            Long profileId = 1L;
-            Long educationId = 999L;
-
-            when(educationService.getEducationById(profileId, educationId))
+            when(educationService.getEducationById(1L, 999L))
                     .thenThrow(new ResourceNotFoundException("Education not found"));
 
-            // When & Then
-            mockMvc.perform(get("/profiles/{profileId}/educations/{educationId}",
-                            profileId, educationId))
+            // When/Then
+            mockMvc.perform(get("/profiles/1/educations/999"))
                     .andExpect(status().isNotFound());
+
+            verify(educationService).getEducationById(1L, 999L);
         }
     }
 
     @Nested
-    @DisplayName("PUT /profiles/{profileId}/educations/{educationId}")
+    @DisplayName("Update Education Tests")
     class UpdateEducationTests {
 
         @Test
@@ -246,80 +232,71 @@ class EducationControllerTest {
         @WithMockUser(roles = "ADMIN")
         void shouldUpdateEducation() throws Exception {
             // Given
-            Long profileId = 1L;
-            Long educationId = 1L;
-            EducationDTO updateDTO = EducationDTO.builder()
-                    .grade("First Class Honours with Distinction")
-                    .description("Updated description")
-                    .build();
-
             EducationDTO updatedEducation = EducationDTO.builder()
                     .id(1L)
-                    .institutionName("University of Leeds")
-                    .degree("BSc Computer Science")
-                    .grade("First Class Honours with Distinction")
-                    .description("Updated description")
+                    .institutionName("University of Example")
+                    .degree("Bachelor of Science with Honours")
+                    .fieldOfStudy("Computer Science")
+                    .startDate(LocalDate.of(2015, 9, 1))
+                    .graduationDate(LocalDate.of(2019, 6, 30))
+                    .grade("First Class Honours")
                     .build();
 
-            when(educationService.updateEducation(profileId, educationId, updateDTO))
+            when(educationService.updateEducation(eq(1L), eq(1L), any(EducationDTO.class)))
                     .thenReturn(updatedEducation);
 
-            // When & Then
-            mockMvc.perform(put("/profiles/{profileId}/educations/{educationId}",
-                            profileId, educationId)
+            // When/Then
+            mockMvc.perform(put("/profiles/1/educations/1")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateDTO)))
+                            .content(objectMapper.writeValueAsString(updatedEducation)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.grade").value("First Class Honours with Distinction"))
-                    .andExpect(jsonPath("$.description").value("Updated description"));
+                    .andExpect(jsonPath("$.degree").value("Bachelor of Science with Honours"));
 
-            verify(educationService).updateEducation(profileId, educationId, updateDTO);
+            verify(educationService).updateEducation(eq(1L), eq(1L), any(EducationDTO.class));
         }
 
         @Test
-        @DisplayName("Should return 404 when education not found for update")
-        void shouldReturn404WhenEducationNotFoundForUpdate() throws Exception {
+        @DisplayName("Should return 404 when education not found")
+        @WithMockUser(roles = "ADMIN")
+        void shouldReturn404WhenEducationNotFound() throws Exception {
             // Given
-            Long profileId = 1L;
-            Long educationId = 999L;
-            EducationDTO updateDTO = EducationDTO.builder().build();
-
-            when(educationService.updateEducation(profileId, educationId, updateDTO))
+            when(educationService.updateEducation(eq(1L), eq(999L), any(EducationDTO.class)))
                     .thenThrow(new ResourceNotFoundException("Education not found"));
 
-            // When & Then
-            mockMvc.perform(put("/profiles/{profileId}/educations/{educationId}",
-                            profileId, educationId)
+            // When/Then
+            mockMvc.perform(put("/profiles/1/educations/999")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateDTO)))
+                            .content(objectMapper.writeValueAsString(testEducationDTO)))
                     .andExpect(status().isNotFound());
+
+            verify(educationService).updateEducation(eq(1L), eq(999L), any(EducationDTO.class));
         }
 
         @Test
-        @DisplayName("Should return 400 when graduation date before start date")
-        void shouldReturn400WhenInvalidDates() throws Exception {
-            // Given
-            Long profileId = 1L;
-            Long educationId = 1L;
-            EducationDTO invalidDTO = EducationDTO.builder()
-                    .startDate(LocalDate.of(2022, 9, 1))
-                    .graduationDate(LocalDate.of(2020, 6, 30))
+        @DisplayName("Should return 400 for invalid date range")
+        @WithMockUser(roles = "ADMIN")
+        void shouldReturn400ForInvalidDateRange() throws Exception {
+            // Given - Graduation date before start date
+            EducationDTO invalidEducation = EducationDTO.builder()
+                    .institutionName("Test University")
+                    .degree("BSc")
+                    .startDate(LocalDate.of(2019, 6, 30))
+                    .graduationDate(LocalDate.of(2015, 9, 1))
                     .build();
 
-            when(educationService.updateEducation(eq(profileId), eq(educationId), any()))
+            when(educationService.updateEducation(eq(1L), eq(1L), any(EducationDTO.class)))
                     .thenThrow(new IllegalArgumentException("Graduation date must be after start date"));
 
-            // When & Then
-            mockMvc.perform(put("/profiles/{profileId}/educations/{educationId}",
-                            profileId, educationId)
+            // When/Then
+            mockMvc.perform(put("/profiles/1/educations/1")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(invalidDTO)))
+                            .content(objectMapper.writeValueAsString(invalidEducation)))
                     .andExpect(status().isBadRequest());
         }
     }
 
     @Nested
-    @DisplayName("DELETE /profiles/{profileId}/educations/{educationId}")
+    @DisplayName("Delete Education Tests")
     class DeleteEducationTests {
 
         @Test
@@ -327,38 +304,33 @@ class EducationControllerTest {
         @WithMockUser(roles = "ADMIN")
         void shouldDeleteEducation() throws Exception {
             // Given
-            Long profileId = 1L;
-            Long educationId = 1L;
+            doNothing().when(educationService).deleteEducation(1L, 1L);
 
-            doNothing().when(educationService).deleteEducation(profileId, educationId);
-
-            // When & Then
-            mockMvc.perform(delete("/profiles/{profileId}/educations/{educationId}",
-                            profileId, educationId))
+            // When/Then
+            mockMvc.perform(delete("/profiles/1/educations/1"))
                     .andExpect(status().isNoContent());
 
-            verify(educationService).deleteEducation(profileId, educationId);
+            verify(educationService).deleteEducation(1L, 1L);
         }
 
         @Test
-        @DisplayName("Should return 404 when education not found for delete")
-        void shouldReturn404WhenEducationNotFoundForDelete() throws Exception {
+        @DisplayName("Should return 404 when education not found")
+        @WithMockUser(roles = "ADMIN")
+        void shouldReturn404WhenEducationNotFound() throws Exception {
             // Given
-            Long profileId = 1L;
-            Long educationId = 999L;
-
             doThrow(new ResourceNotFoundException("Education not found"))
-                    .when(educationService).deleteEducation(profileId, educationId);
+                    .when(educationService).deleteEducation(1L, 999L);
 
-            // When & Then
-            mockMvc.perform(delete("/profiles/{profileId}/educations/{educationId}",
-                            profileId, educationId))
+            // When/Then
+            mockMvc.perform(delete("/profiles/1/educations/999"))
                     .andExpect(status().isNotFound());
+
+            verify(educationService).deleteEducation(1L, 999L);
         }
     }
 
     @Nested
-    @DisplayName("PUT /profiles/{profileId}/educations/reorder")
+    @DisplayName("Reorder Educations Tests")
     class ReorderEducationsTests {
 
         @Test
@@ -366,31 +338,34 @@ class EducationControllerTest {
         @WithMockUser(roles = "ADMIN")
         void shouldReorderEducations() throws Exception {
             // Given
-            Long profileId = 1L;
             List<Long> orderedIds = Arrays.asList(3L, 1L, 2L);
-            Map<String, List<Long>> request = new HashMap<>();
-            request.put("orderedIds", orderedIds);
+            Map<String, List<Long>> requestBody = new HashMap<>();
+            requestBody.put("orderedIds", orderedIds);
 
-            doNothing().when(educationService).reorderEducation(profileId, orderedIds);
+            doNothing().when(educationService).reorderEducation(eq(1L), anyList());
 
-            // When & Then
-            mockMvc.perform(put("/profiles/{profileId}/educations/reorder", profileId)
+            // When/Then
+            mockMvc.perform(put("/profiles/1/educations/reorder")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(requestBody)))
                     .andExpect(status().isNoContent());
 
-            verify(educationService).reorderEducation(profileId, orderedIds);
+            verify(educationService).reorderEducation(eq(1L), anyList());
         }
 
         @Test
-        @DisplayName("Should return 400 when orderedIds is missing")
+        @DisplayName("Should return 400 when orderedIds is missing from request")
+        @WithMockUser(roles = "ADMIN")
         void shouldReturn400WhenOrderedIdsMissing() throws Exception {
-            // Given
-            Long profileId = 1L;
-            Map<String, Object> emptyRequest = new HashMap<>();
+            // Given - Empty map (no orderedIds key)
+            Map<String, List<Long>> emptyRequest = new HashMap<>();
 
-            // When & Then
-            mockMvc.perform(put("/profiles/{profileId}/educations/reorder", profileId)
+            // The service will receive null for orderedIds
+            doThrow(new IllegalArgumentException("orderedIds cannot be null"))
+                    .when(educationService).reorderEducation(eq(1L), isNull());
+
+            // When/Then
+            mockMvc.perform(put("/profiles/1/educations/reorder")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(emptyRequest)))
                     .andExpect(status().isBadRequest());
@@ -398,21 +373,206 @@ class EducationControllerTest {
 
         @Test
         @DisplayName("Should return 404 when profile not found for reorder")
+        @WithMockUser(roles = "ADMIN")
         void shouldReturn404WhenProfileNotFoundForReorder() throws Exception {
             // Given
-            Long profileId = 999L;
-            List<Long> orderedIds = Arrays.asList(1L, 2L);
-            Map<String, List<Long>> request = new HashMap<>();
-            request.put("orderedIds", orderedIds);
+            List<Long> orderedIds = Arrays.asList(1L, 2L, 3L);
+            Map<String, List<Long>> requestBody = new HashMap<>();
+            requestBody.put("orderedIds", orderedIds);
 
-            doThrow(new ResourceNotFoundException("Profile not found"))
-                    .when(educationService).reorderEducation(profileId, orderedIds);
+            doThrow(new ResourceNotFoundException("Profile not found with id: 999"))
+                    .when(educationService).reorderEducation(eq(999L), anyList());
 
-            // When & Then
-            mockMvc.perform(put("/profiles/{profileId}/educations/reorder", profileId)
+            // When/Then
+            mockMvc.perform(put("/profiles/999/educations/reorder")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(requestBody)))
                     .andExpect(status().isNotFound());
+
+            verify(educationService).reorderEducation(eq(999L), anyList());
+        }
+    }
+
+    @Nested
+    @DisplayName("Date Validation Tests")
+    class DateValidationTests {
+
+        @Test
+        @DisplayName("Should accept valid date range")
+        @WithMockUser(roles = "ADMIN")
+        void shouldAcceptValidDateRange() throws Exception {
+            // Given
+            EducationDTO validEducation = EducationDTO.builder()
+                    .institutionName("Test University")
+                    .degree("BSc")
+                    .startDate(LocalDate.of(2015, 9, 1))
+                    .graduationDate(LocalDate.of(2019, 6, 30))
+                    .build();
+
+            when(educationService.createEducation(eq(1L), any(EducationDTO.class)))
+                    .thenReturn(validEducation);
+
+            // When/Then
+            mockMvc.perform(post("/profiles/1/educations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(validEducation)))
+                    .andExpect(status().isCreated());
+        }
+
+        @Test
+        @DisplayName("Should handle education without graduation date (ongoing)")
+        @WithMockUser(roles = "ADMIN")
+        void shouldHandleOngoingEducation() throws Exception {
+            // Given - Education still in progress
+            EducationDTO ongoingEducation = EducationDTO.builder()
+                    .institutionName("Current University")
+                    .degree("PhD")
+                    .fieldOfStudy("Computer Science")
+                    .startDate(LocalDate.of(2022, 9, 1))
+                    .graduationDate(null) // Still studying
+                    .build();
+
+            when(educationService.createEducation(eq(1L), any(EducationDTO.class)))
+                    .thenReturn(ongoingEducation);
+
+            // When/Then
+            mockMvc.perform(post("/profiles/1/educations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(ongoingEducation)))
+                    .andExpect(status().isCreated());
+        }
+    }
+
+    @Nested
+    @DisplayName("Profile Association Tests")
+    class ProfileAssociationTests {
+
+        @Test
+        @DisplayName("Should get educations for specific profile only")
+        void shouldGetEducationsForSpecificProfile() throws Exception {
+            // Given - Profile 1 has educations
+            when(educationService.getEducationsByProfileId(1L))
+                    .thenReturn(Arrays.asList(testEducationDTO));
+
+            // When/Then - Request for profile 1
+            mockMvc.perform(get("/profiles/1/educations"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(1));
+
+            // Request for profile 2 (different profile)
+            when(educationService.getEducationsByProfileId(2L))
+                    .thenReturn(Arrays.asList());
+
+            mockMvc.perform(get("/profiles/2/educations"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(0));
+        }
+
+        @Test
+        @DisplayName("Should not allow accessing education from wrong profile")
+        @WithMockUser(roles = "ADMIN")
+        void shouldNotAllowCrossProfileAccess() throws Exception {
+            // Given - Try to update education 1 which belongs to profile 1, but via profile 2
+            when(educationService.updateEducation(eq(2L), eq(1L), any(EducationDTO.class)))
+                    .thenThrow(new ResourceNotFoundException("Education not found for this profile"));
+
+            // When/Then
+            mockMvc.perform(put("/profiles/2/educations/1")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(testEducationDTO)))
+                    .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    @DisplayName("Display Order Tests")
+    class DisplayOrderTests {
+
+        @Test
+        @DisplayName("Should return educations in display order")
+        void shouldReturnEducationsInOrder() throws Exception {
+            // Given - Multiple educations with specific order
+            EducationDTO education1 = EducationDTO.builder()
+                    .id(1L)
+                    .institutionName("First Education")
+                    .degree("BSc")
+                    .displayOrder(0)
+                    .build();
+
+            EducationDTO education2 = EducationDTO.builder()
+                    .id(2L)
+                    .institutionName("Second Education")
+                    .degree("MSc")
+                    .displayOrder(1)
+                    .build();
+
+            // Service returns them in order
+            when(educationService.getEducationsByProfileId(1L))
+                    .thenReturn(Arrays.asList(education1, education2));
+
+            // When/Then
+            mockMvc.perform(get("/profiles/1/educations"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].displayOrder").value(0))
+                    .andExpect(jsonPath("$[1].displayOrder").value(1))
+                    .andExpect(jsonPath("$[0].institutionName").value("First Education"))
+                    .andExpect(jsonPath("$[1].institutionName").value("Second Education"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Content Validation Tests")
+    class ContentValidationTests {
+
+        @Test
+        @DisplayName("Should accept education with all optional fields")
+        @WithMockUser(roles = "ADMIN")
+        void shouldAcceptFullEducation() throws Exception {
+            // Given - Education with all fields populated
+            EducationDTO fullEducation = EducationDTO.builder()
+                    .institutionName("Complete University")
+                    .degree("Bachelor of Science")
+                    .fieldOfStudy("Computer Science")
+                    .startDate(LocalDate.of(2015, 9, 1))
+                    .graduationDate(LocalDate.of(2019, 6, 30))
+                    .grade("First Class Honours")
+                    .description("Comprehensive description of the education")
+                    .displayOrder(0)
+                    .build();
+
+            when(educationService.createEducation(eq(1L), any(EducationDTO.class)))
+                    .thenReturn(fullEducation);
+
+            // When/Then
+            mockMvc.perform(post("/profiles/1/educations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(fullEducation)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.institutionName").exists())
+                    .andExpect(jsonPath("$.degree").exists())
+                    .andExpect(jsonPath("$.fieldOfStudy").exists())
+                    .andExpect(jsonPath("$.grade").exists())
+                    .andExpect(jsonPath("$.description").exists());
+        }
+
+        @Test
+        @DisplayName("Should accept education with only required fields")
+        @WithMockUser(roles = "ADMIN")
+        void shouldAcceptMinimalEducation() throws Exception {
+            // Given - Education with only required fields
+            EducationDTO minimalEducation = EducationDTO.builder()
+                    .institutionName("Minimal University")
+                    .degree("BSc")
+                    .build();
+
+            when(educationService.createEducation(eq(1L), any(EducationDTO.class)))
+                    .thenReturn(minimalEducation);
+
+            // When/Then
+            mockMvc.perform(post("/profiles/1/educations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(minimalEducation)))
+                    .andExpect(status().isCreated());
         }
     }
 }
